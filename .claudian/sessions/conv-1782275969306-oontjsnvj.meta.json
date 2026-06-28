@@ -1,0 +1,14 @@
+{
+  "id": "conv-1782275969306-oontjsnvj",
+  "providerId": "claude",
+  "title": "把这两个转换为四级标题",
+  "titleGenerationStatus": "failed",
+  "createdAt": 1782275969307,
+  "updatedAt": 1782291858342,
+  "lastResponseAt": 1782276103016,
+  "sessionId": "c3f47bca-af91-4830-afad-c1f68cd29760",
+  "providerState": {
+    "providerSessionId": "c3f47bca-af91-4830-afad-c1f68cd29760"
+  },
+  "currentNote": "03-Java/Java基础面试题.md"
+}

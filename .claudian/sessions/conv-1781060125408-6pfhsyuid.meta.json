@@ -1,0 +1,24 @@
+{
+  "id": "conv-1781060125408-6pfhsyuid",
+  "providerId": "claude",
+  "title": "Clarify meaning of a reference",
+  "titleGenerationStatus": "success",
+  "createdAt": 1781060125411,
+  "updatedAt": 1781073093458,
+  "lastResponseAt": 1781067215720,
+  "sessionId": "315f8745-b558-49fe-8dd6-c059fb81f951",
+  "providerState": {
+    "providerSessionId": "315f8745-b558-49fe-8dd6-c059fb81f951"
+  },
+  "currentNote": "03-Java/jvm_review.md",
+  "usage": {
+    "model": "opus",
+    "inputTokens": 894,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 78720,
+    "contextWindow": 200000,
+    "contextTokens": 79614,
+    "percentage": 40,
+    "contextWindowIsAuthoritative": true
+  }
+}

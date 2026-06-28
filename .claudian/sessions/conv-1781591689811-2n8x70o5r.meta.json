@@ -1,0 +1,24 @@
+{
+  "id": "conv-1781591689811-2n8x70o5r",
+  "providerId": "claude",
+  "title": "啥叫裸CAS",
+  "titleGenerationStatus": "failed",
+  "createdAt": 1781591689812,
+  "updatedAt": 1781672386258,
+  "lastResponseAt": 1781597267534,
+  "sessionId": "b754144d-9345-4331-8f1b-6d2331e70c0d",
+  "providerState": {
+    "providerSessionId": "b754144d-9345-4331-8f1b-6d2331e70c0d"
+  },
+  "currentNote": "03-Java/AQS 详解.md",
+  "usage": {
+    "model": "MiniMax-M3",
+    "inputTokens": 78149,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 114,
+    "contextWindow": 200000,
+    "contextTokens": 78263,
+    "percentage": 39,
+    "contextWindowIsAuthoritative": true
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "conv-1780735787564-kp0rr9763",
+  "providerId": "claude",
+  "title": "Move files to 二分 folder",
+  "titleGenerationStatus": "success",
+  "createdAt": 1780735787565,
+  "updatedAt": 1780886981181,
+  "lastResponseAt": 1780735833986,
+  "sessionId": "eedef6dd-c85f-4a73-8fca-fd79409839d4",
+  "providerState": {
+    "providerSessionId": "eedef6dd-c85f-4a73-8fca-fd79409839d4"
+  },
+  "usage": {
+    "model": "opus",
+    "inputTokens": 129,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 28928,
+    "contextWindow": 200000,
+    "contextTokens": 29057,
+    "percentage": 15,
+    "contextWindowIsAuthoritative": true
+  }
+}

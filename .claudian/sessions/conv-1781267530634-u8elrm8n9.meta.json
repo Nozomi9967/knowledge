@@ -1,0 +1,24 @@
+{
+  "id": "conv-1781267530634-u8elrm8n9",
+  "providerId": "claude",
+  "title": "这里阻塞指的是主线程会阻塞",
+  "titleGenerationStatus": "failed",
+  "createdAt": 1781267530635,
+  "updatedAt": 1781269731031,
+  "lastResponseAt": 1781268699106,
+  "sessionId": "53577bb8-3d47-44dc-9d0b-0ed5e163ad25",
+  "providerState": {
+    "providerSessionId": "53577bb8-3d47-44dc-9d0b-0ed5e163ad25"
+  },
+  "currentNote": "03-Java/Java并发编程面试题.md",
+  "usage": {
+    "model": "MiniMax-M3",
+    "inputTokens": 30674,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 114,
+    "contextWindow": 200000,
+    "contextTokens": 30788,
+    "percentage": 15,
+    "contextWindowIsAuthoritative": true
+  }
+}

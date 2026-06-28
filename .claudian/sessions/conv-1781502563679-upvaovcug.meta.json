@@ -1,0 +1,24 @@
+{
+  "id": "conv-1781502563679-upvaovcug",
+  "providerId": "claude",
+  "title": "这里怎么不介绍共享模式、独占模式具体是啥",
+  "titleGenerationStatus": "failed",
+  "createdAt": 1781502563680,
+  "updatedAt": 1781590796977,
+  "lastResponseAt": 1781506533105,
+  "sessionId": "6c3e0e84-662a-4a8c-9b02-54a1baa1fc6d",
+  "providerState": {
+    "providerSessionId": "6c3e0e84-662a-4a8c-9b02-54a1baa1fc6d"
+  },
+  "currentNote": "03-Java/AQS 详解.md",
+  "usage": {
+    "model": "MiniMax-M3",
+    "inputTokens": 71882,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 114,
+    "contextWindow": 200000,
+    "contextTokens": 71996,
+    "percentage": 36,
+    "contextWindowIsAuthoritative": true
+  }
+}

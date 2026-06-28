@@ -1,0 +1,23 @@
+{
+  "id": "conv-1781242659522-cuvdhlrzh",
+  "providerId": "claude",
+  "title": "你好",
+  "titleGenerationStatus": "failed",
+  "createdAt": 1781242659522,
+  "updatedAt": 1781243973126,
+  "lastResponseAt": 1781242841610,
+  "sessionId": "3c2ea901-f175-46f7-bc12-36b2e324db89",
+  "providerState": {
+    "providerSessionId": "3c2ea901-f175-46f7-bc12-36b2e324db89"
+  },
+  "currentNote": "03-Java/内存屏障和happens-before.md",
+  "usage": {
+    "model": "MiniMax-M3",
+    "inputTokens": 0,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 0,
+    "contextWindow": 200000,
+    "contextTokens": 0,
+    "percentage": 0
+  }
+}

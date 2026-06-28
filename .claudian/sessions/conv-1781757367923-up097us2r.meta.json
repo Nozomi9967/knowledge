@@ -1,0 +1,24 @@
+{
+  "id": "conv-1781757367923-up097us2r",
+  "providerId": "claude",
+  "title": "帮我找一下，除了该文件还有哪里讲了插入意向锁",
+  "titleGenerationStatus": "failed",
+  "createdAt": 1781757367925,
+  "updatedAt": 1781766672991,
+  "lastResponseAt": 1781761597135,
+  "sessionId": "67595318-caaf-41f3-9989-c85af6cd5611",
+  "providerState": {
+    "providerSessionId": "67595318-caaf-41f3-9989-c85af6cd5611"
+  },
+  "currentNote": "02-MySQL/mysql_八股整理.md",
+  "usage": {
+    "model": "MiniMax-M3",
+    "inputTokens": 49159,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 114,
+    "contextWindow": 200000,
+    "contextTokens": 49273,
+    "percentage": 25,
+    "contextWindowIsAuthoritative": true
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "conv-1781169476194-tg6g3vras",
+  "providerId": "claude",
+  "title": "Explain why no CPU consumption",
+  "titleGenerationStatus": "success",
+  "createdAt": 1781169476195,
+  "updatedAt": 1781241505316,
+  "lastResponseAt": 1781169682245,
+  "sessionId": "81f8a3cf-a049-4884-8af2-85c0af29cadc",
+  "providerState": {
+    "providerSessionId": "81f8a3cf-a049-4884-8af2-85c0af29cadc"
+  },
+  "currentNote": "03-Java/Java并发编程面试题.md",
+  "usage": {
+    "model": "opus",
+    "inputTokens": 746,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 55040,
+    "contextWindow": 200000,
+    "contextTokens": 55786,
+    "percentage": 28,
+    "contextWindowIsAuthoritative": true
+  }
+}

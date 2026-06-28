@@ -1,0 +1,24 @@
+{
+  "id": "conv-1781941818137-j33yzreyy",
+  "providerId": "claude",
+  "title": "这里write拷贝回去，指的是啥数据",
+  "titleGenerationStatus": "failed",
+  "createdAt": 1781941818137,
+  "updatedAt": 1782027362609,
+  "lastResponseAt": 1781941865616,
+  "sessionId": "969f9dde-94a0-4640-80ea-4bd9cfdbc882",
+  "providerState": {
+    "providerSessionId": "969f9dde-94a0-4640-80ea-4bd9cfdbc882"
+  },
+  "currentNote": "01-Redis/如何理解随着网络硬件的性能提升，Redis的性能瓶颈有时会出现在网络IO的处理上.md",
+  "usage": {
+    "model": "MiniMax-M3",
+    "inputTokens": 31636,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 30411,
+    "contextWindow": 200000,
+    "contextTokens": 62047,
+    "percentage": 31,
+    "contextWindowIsAuthoritative": true
+  }
+}

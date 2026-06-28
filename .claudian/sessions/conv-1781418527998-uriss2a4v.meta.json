@@ -1,0 +1,24 @@
+{
+  "id": "conv-1781418527998-uriss2a4v",
+  "providerId": "claude",
+  "title": "**key 是对 ThreadLocal 对象的弱引用** （而不是强引用持有 ThreadLoca...",
+  "titleGenerationStatus": "failed",
+  "createdAt": 1781418527999,
+  "updatedAt": 1781442710892,
+  "lastResponseAt": 1781421752752,
+  "sessionId": "b18c559b-e872-475d-a64b-6612f6e29761",
+  "providerState": {
+    "providerSessionId": "b18c559b-e872-475d-a64b-6612f6e29761"
+  },
+  "currentNote": "03-Java/Java并发编程面试题.md",
+  "usage": {
+    "model": "MiniMax-M3",
+    "inputTokens": 42800,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 114,
+    "contextWindow": 200000,
+    "contextTokens": 42914,
+    "percentage": 21,
+    "contextWindowIsAuthoritative": true
+  }
+}

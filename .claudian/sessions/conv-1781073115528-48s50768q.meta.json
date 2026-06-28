@@ -1,0 +1,24 @@
+{
+  "id": "conv-1781073115528-48s50768q",
+  "providerId": "claude",
+  "title": "Consolidate Java concurrency notes",
+  "titleGenerationStatus": "success",
+  "createdAt": 1781073115530,
+  "updatedAt": 1781097854144,
+  "lastResponseAt": 1781076850382,
+  "sessionId": "f0110219-aa69-43fa-920e-945a4d5f7369",
+  "providerState": {
+    "providerSessionId": "f0110219-aa69-43fa-920e-945a4d5f7369"
+  },
+  "currentNote": "03-Java/Java并发编程面试题.md",
+  "usage": {
+    "model": "opus",
+    "inputTokens": 395,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 104832,
+    "contextWindow": 200000,
+    "contextTokens": 105227,
+    "percentage": 53,
+    "contextWindowIsAuthoritative": true
+  }
+}

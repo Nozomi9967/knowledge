@@ -1,0 +1,23 @@
+{
+  "id": "conv-1780317120623-kvgrltmrk",
+  "providerId": "claude",
+  "title": "Clarify thread-safe copy semantics",
+  "titleGenerationStatus": "success",
+  "createdAt": 1780317120625,
+  "updatedAt": 1780467531108,
+  "lastResponseAt": 1780406746094,
+  "sessionId": "0e08344f-016c-4c1f-bc9e-f4d022a8c4b2",
+  "providerState": {
+    "providerSessionId": "0e08344f-016c-4c1f-bc9e-f4d022a8c4b2"
+  },
+  "usage": {
+    "model": "opus",
+    "inputTokens": 222,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 125184,
+    "contextWindow": 200000,
+    "contextTokens": 125406,
+    "percentage": 63,
+    "contextWindowIsAuthoritative": true
+  }
+}

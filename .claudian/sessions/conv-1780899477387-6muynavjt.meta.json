@@ -1,0 +1,23 @@
+{
+  "id": "conv-1780899477387-6muynavjt",
+  "providerId": "claude",
+  "title": "Convert question link to todo",
+  "titleGenerationStatus": "success",
+  "createdAt": 1780899477388,
+  "updatedAt": 1780905202324,
+  "lastResponseAt": 1780899559718,
+  "sessionId": "af3596c6-2547-4418-ac22-968e9ae4e499",
+  "providerState": {
+    "providerSessionId": "af3596c6-2547-4418-ac22-968e9ae4e499"
+  },
+  "usage": {
+    "model": "opus",
+    "inputTokens": 764,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 67456,
+    "contextWindow": 200000,
+    "contextTokens": 68220,
+    "percentage": 34,
+    "contextWindowIsAuthoritative": true
+  }
+}

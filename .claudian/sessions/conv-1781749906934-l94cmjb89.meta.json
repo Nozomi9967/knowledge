@@ -1,0 +1,24 @@
+{
+  "id": "conv-1781749906934-l94cmjb89",
+  "providerId": "claude",
+  "title": "mysql_八股整理和mysql八股合并",
+  "titleGenerationStatus": "failed",
+  "createdAt": 1781749906935,
+  "updatedAt": 1781750603490,
+  "lastResponseAt": 1781750157432,
+  "sessionId": "4c60cc44-4821-49b9-a8c0-f375a81a05f1",
+  "providerState": {
+    "providerSessionId": "4c60cc44-4821-49b9-a8c0-f375a81a05f1"
+  },
+  "currentNote": "02-MySQL/mysql_八股整理.md",
+  "usage": {
+    "model": "MiniMax-M3",
+    "inputTokens": 65154,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 128,
+    "contextWindow": 200000,
+    "contextTokens": 65282,
+    "percentage": 33,
+    "contextWindowIsAuthoritative": true
+  }
+}

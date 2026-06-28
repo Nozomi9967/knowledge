@@ -1,0 +1,24 @@
+{
+  "id": "conv-1780887000211-5trbh2q5l",
+  "providerId": "claude",
+  "title": "Explain MyBatis driver loading via reflection",
+  "titleGenerationStatus": "success",
+  "createdAt": 1780887000212,
+  "updatedAt": 1780899460973,
+  "lastResponseAt": 1780898636718,
+  "sessionId": "7a2cb17c-d654-4c58-bac4-fabee2ee77f4",
+  "providerState": {
+    "providerSessionId": "7a2cb17c-d654-4c58-bac4-fabee2ee77f4"
+  },
+  "currentNote": "03-Java/Java基础面试题.md",
+  "usage": {
+    "model": "opus",
+    "inputTokens": 177,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 78976,
+    "contextWindow": 200000,
+    "contextTokens": 79153,
+    "percentage": 40,
+    "contextWindowIsAuthoritative": true
+  }
+}

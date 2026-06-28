@@ -1,0 +1,24 @@
+{
+  "id": "conv-1782305799587-o8xp4unb4",
+  "providerId": "claude",
+  "title": "reentrantlock就不会被盯住了吗",
+  "titleGenerationStatus": "failed",
+  "createdAt": 1782305799587,
+  "updatedAt": 1782375514344,
+  "lastResponseAt": 1782305986296,
+  "sessionId": "eefbf38f-9428-4141-9ea5-3c46f9f4f61d",
+  "providerState": {
+    "providerSessionId": "eefbf38f-9428-4141-9ea5-3c46f9f4f61d"
+  },
+  "currentNote": "06-其他杂项/虚拟线程详解.md",
+  "usage": {
+    "model": "sonnet",
+    "inputTokens": 2,
+    "cacheCreationInputTokens": 448,
+    "cacheReadInputTokens": 50413,
+    "contextWindow": 200000,
+    "contextTokens": 50863,
+    "percentage": 25,
+    "contextWindowIsAuthoritative": true
+  }
+}

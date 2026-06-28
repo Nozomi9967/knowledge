@@ -1,0 +1,14 @@
+{
+  "id": "conv-1782304929103-oj160iehg",
+  "providerId": "claude",
+  "title": "这里应该是实现接口吧",
+  "titleGenerationStatus": "failed",
+  "createdAt": 1782304929103,
+  "updatedAt": 1782305777940,
+  "lastResponseAt": 1782304954877,
+  "sessionId": "2ee0c3e2-0d5b-4ee8-b650-77c95d333178",
+  "providerState": {
+    "providerSessionId": "2ee0c3e2-0d5b-4ee8-b650-77c95d333178"
+  },
+  "currentNote": "06-其他杂项/Record类详解.md"
+}

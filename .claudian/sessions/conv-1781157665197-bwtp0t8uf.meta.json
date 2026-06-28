@@ -1,0 +1,24 @@
+{
+  "id": "conv-1781157665197-bwtp0t8uf",
+  "providerId": "claude",
+  "title": "Add selected content to table and body",
+  "titleGenerationStatus": "success",
+  "createdAt": 1781157665197,
+  "updatedAt": 1781159217367,
+  "lastResponseAt": 1781159190286,
+  "sessionId": "455b44b6-3d06-40b4-b872-fd7017437f4d",
+  "providerState": {
+    "providerSessionId": "455b44b6-3d06-40b4-b872-fd7017437f4d"
+  },
+  "currentNote": "06-其他杂项/面试分析报告.md",
+  "usage": {
+    "model": "opus",
+    "inputTokens": 1196,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 101248,
+    "contextWindow": 200000,
+    "contextTokens": 102444,
+    "percentage": 51,
+    "contextWindowIsAuthoritative": true
+  }
+}

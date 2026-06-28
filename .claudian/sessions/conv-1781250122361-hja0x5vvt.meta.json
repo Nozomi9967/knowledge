@@ -1,0 +1,24 @@
+{
+  "id": "conv-1781250122361-hja0x5vvt",
+  "providerId": "claude",
+  "title": "怎么基本使用，下面补充",
+  "titleGenerationStatus": "failed",
+  "createdAt": 1781250122362,
+  "updatedAt": 1781253980713,
+  "lastResponseAt": 1781250183548,
+  "sessionId": "e61b640a-258a-4e2f-a145-1eb9d38ffa43",
+  "providerState": {
+    "providerSessionId": "e61b640a-258a-4e2f-a145-1eb9d38ffa43"
+  },
+  "currentNote": "03-Java/Java并发编程面试题.md",
+  "usage": {
+    "model": "MiniMax-M3",
+    "inputTokens": 34428,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 114,
+    "contextWindow": 200000,
+    "contextTokens": 34542,
+    "percentage": 17,
+    "contextWindowIsAuthoritative": true
+  }
+}

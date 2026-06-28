@@ -1,0 +1,24 @@
+{
+  "id": "conv-1781152882983-xyuytrv7f",
+  "providerId": "claude",
+  "title": "Clarify meaning of term",
+  "titleGenerationStatus": "success",
+  "createdAt": 1781152882984,
+  "updatedAt": 1781157635111,
+  "lastResponseAt": 1781153322281,
+  "sessionId": "8a3db809-3232-46b1-bfca-b96589181c9d",
+  "providerState": {
+    "providerSessionId": "8a3db809-3232-46b1-bfca-b96589181c9d"
+  },
+  "currentNote": "06-其他杂项/MyBatis-Plus详解.md",
+  "usage": {
+    "model": "opus",
+    "inputTokens": 725,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 34176,
+    "contextWindow": 200000,
+    "contextTokens": 34901,
+    "percentage": 17,
+    "contextWindowIsAuthoritative": true
+  }
+}

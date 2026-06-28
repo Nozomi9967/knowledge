@@ -1,0 +1,24 @@
+{
+  "id": "conv-1781097866142-41rzmvol6",
+  "providerId": "claude",
+  "title": "面试术语发音指导",
+  "titleGenerationStatus": "success",
+  "createdAt": 1781097866143,
+  "updatedAt": 1781152877166,
+  "lastResponseAt": 1781151930703,
+  "sessionId": "1fecce31-d7ad-4e62-9bf8-e12f6ec14819",
+  "providerState": {
+    "providerSessionId": "1fecce31-d7ad-4e62-9bf8-e12f6ec14819"
+  },
+  "currentNote": "06-其他杂项/面试分析报告.md",
+  "usage": {
+    "model": "opus",
+    "inputTokens": 477,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 145920,
+    "contextWindow": 200000,
+    "contextTokens": 146397,
+    "percentage": 73,
+    "contextWindowIsAuthoritative": true
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "conv-1782291885897-ekrv9s16c",
+  "providerId": "claude",
+  "title": "### **Java为什么区分受检异常和非受检异常？**",
+  "titleGenerationStatus": "failed",
+  "createdAt": 1782291885898,
+  "updatedAt": 1782304919743,
+  "lastResponseAt": 1782293221478,
+  "sessionId": "3bcfd1af-46ee-4699-a335-5548c0ab96db",
+  "providerState": {
+    "providerSessionId": "3bcfd1af-46ee-4699-a335-5548c0ab96db"
+  },
+  "currentNote": "03-Java/Java基础面试题.md",
+  "usage": {
+    "model": "sonnet",
+    "inputTokens": 747,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 46208,
+    "contextWindow": 200000,
+    "contextTokens": 46955,
+    "percentage": 23,
+    "contextWindowIsAuthoritative": true
+  }
+}

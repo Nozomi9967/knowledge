@@ -1,0 +1,24 @@
+{
+  "id": "conv-1780482154403-b7il4jjqr",
+  "providerId": "claude",
+  "title": "额",
+  "titleGenerationStatus": "failed",
+  "createdAt": 1780482154405,
+  "updatedAt": 1780482582565,
+  "lastResponseAt": 1780482582565,
+  "sessionId": "4e570b5b-9e6d-42c7-95e6-6f03db6e02f5",
+  "providerState": {
+    "providerSessionId": "4e570b5b-9e6d-42c7-95e6-6f03db6e02f5"
+  },
+  "currentNote": "FastDFS.md",
+  "usage": {
+    "model": "haiku",
+    "inputTokens": 95,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 29696,
+    "contextWindow": 200000,
+    "contextTokens": 29791,
+    "percentage": 15,
+    "contextWindowIsAuthoritative": true
+  }
+}

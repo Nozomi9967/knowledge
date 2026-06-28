@@ -1,0 +1,24 @@
+{
+  "id": "conv-1781241538230-sy4cn2o8s",
+  "providerId": "claude",
+  "title": "这个8和1重复了，把8合并进去，并删除，序号递推改",
+  "titleGenerationStatus": "failed",
+  "createdAt": 1781241538231,
+  "updatedAt": 1781241900258,
+  "lastResponseAt": 1781241762435,
+  "sessionId": "71d29568-617c-4361-904f-4a6dc0ea1630",
+  "providerState": {
+    "providerSessionId": "71d29568-617c-4361-904f-4a6dc0ea1630"
+  },
+  "currentNote": "03-Java/答案-Java并发-多线程.md",
+  "usage": {
+    "model": "haiku",
+    "inputTokens": 0,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 0,
+    "contextWindow": 200000,
+    "contextTokens": 0,
+    "percentage": 0,
+    "contextWindowIsAuthoritative": false
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "conv-1782375523065-72dfxhris",
+  "providerId": "claude",
+  "title": "这哪危险了",
+  "titleGenerationStatus": "failed",
+  "createdAt": 1782375523066,
+  "updatedAt": 1782381426787,
+  "lastResponseAt": 1782376043197,
+  "sessionId": "dea3d68b-c2a2-4a64-bf14-6bfad48d506d",
+  "providerState": {
+    "providerSessionId": "dea3d68b-c2a2-4a64-bf14-6bfad48d506d"
+  },
+  "currentNote": "03-Java/Java基础面试题.md",
+  "usage": {
+    "model": "sonnet",
+    "inputTokens": 96,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 44288,
+    "contextWindow": 200000,
+    "contextTokens": 44384,
+    "percentage": 22,
+    "contextWindowIsAuthoritative": true
+  }
+}

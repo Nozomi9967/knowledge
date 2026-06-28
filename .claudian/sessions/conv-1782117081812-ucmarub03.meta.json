@@ -1,0 +1,24 @@
+{
+  "id": "conv-1782117081812-ucmarub03",
+  "providerId": "claude",
+  "title": "为啥强调静态",
+  "titleGenerationStatus": "failed",
+  "createdAt": 1782117081812,
+  "updatedAt": 1782275953350,
+  "lastResponseAt": 1782127068745,
+  "sessionId": "f95c6202-9b28-4e03-8b41-b5fa15caf9e3",
+  "providerState": {
+    "providerSessionId": "f95c6202-9b28-4e03-8b41-b5fa15caf9e3"
+  },
+  "currentNote": "03-Java/jvm八股.md",
+  "usage": {
+    "model": "sonnet",
+    "inputTokens": 68,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 57856,
+    "contextWindow": 200000,
+    "contextTokens": 57924,
+    "percentage": 29,
+    "contextWindowIsAuthoritative": true
+  }
+}

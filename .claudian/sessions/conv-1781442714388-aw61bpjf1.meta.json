@@ -1,0 +1,24 @@
+{
+  "id": "conv-1781442714388-aw61bpjf1",
+  "providerId": "claude",
+  "title": "为啥",
+  "titleGenerationStatus": "failed",
+  "createdAt": 1781442714390,
+  "updatedAt": 1781502545759,
+  "lastResponseAt": 1781501370898,
+  "sessionId": "41fcae47-4206-49da-b385-365433050bc8",
+  "providerState": {
+    "providerSessionId": "41fcae47-4206-49da-b385-365433050bc8"
+  },
+  "currentNote": "03-Java/Java并发编程面试题.md",
+  "usage": {
+    "model": "MiniMax-M3",
+    "inputTokens": 92492,
+    "cacheCreationInputTokens": 0,
+    "cacheReadInputTokens": 114,
+    "contextWindow": 200000,
+    "contextTokens": 92606,
+    "percentage": 46,
+    "contextWindowIsAuthoritative": true
+  }
+}

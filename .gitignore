@@ -1,3 +1,16 @@
+# Claude 会话记录和临时文件
+.claudian/
+.claude/
+
+# Obsidian 缓存
+.obsidian/workspace.json
+.obsidian/workspace
+.obsidian/cache/
+
+# 其他
 images/
 Spring MVC知识点/
 spring-aop-demo/
+pdf/
+.DS_Store
+Thumbs.db

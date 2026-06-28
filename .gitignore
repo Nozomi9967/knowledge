@@ -1,16 +1,17 @@
-# Claude 会话记录和临时文件
-.claudian/
-.claude/
+# 默认忽略所有
+/*
 
-# Obsidian 缓存
-.obsidian/workspace.json
-.obsidian/workspace
-.obsidian/cache/
+# 只保留 01-04 知识库（手机同步用）
+!/01-Redis/
+!/01-Redis/**
+!/02-MySQL/
+!/02-MySQL/**
+!/03-Java/
+!/03-Java/**
+!/04-Spring/
+!/04-Spring/**
+!.gitignore
 
-# 其他
-images/
-Spring MVC知识点/
-spring-aop-demo/
-pdf/
+# 系统文件
 .DS_Store
 Thumbs.db

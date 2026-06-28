@@ -156,6 +156,8 @@ Caffeine      →  ✅ 读无锁、W-TinyLFU 高命中率、生产级线程安�
 3. 业务中有一个 `HashMap<Long, User>` 缓存对象，重启后从数据库加载 50 万条记录花费 12 秒。请分析可能的性能瓶颈（初始容量、扩容、hash 冲突），并给出优化方案。
 
 
+### 题 3 解析：HashMap 加载性能优化
+
 > [!abstract] 一句话总结
 > **HashMap 加载 50 万条数据耗时 12 秒**，核心瓶颈在于默认初始容量过小导致的反复扩容（rehash），优化方式是预设容量 `new HashMap<>(700000)` 并配合批量查询与并行加载，可将耗时压缩到 1-2 秒级别。
 
@@ -169,11 +171,11 @@ Caffeine      →  ✅ 读无锁、W-TinyLFU 高命中率、生产级线程安�
 
   
 
-### 一、性能瓶颈分析
+#### 一、性能瓶颈分析
 
   
 
-#### 1. 初始容量与扩容（最主要瓶颈）
+**1. 初始容量与扩容（最主要瓶颈）**
 
   
 
@@ -211,7 +213,7 @@ $$
 
   
 
-#### 2. Hash 冲突
+**2. Hash 冲突**
 
   
 
@@ -245,7 +247,7 @@ return (int)(value ^ (value >>> 32));
 
   
 
-#### 3. 其他隐性瓶颈
+**3. 其他隐性瓶颈**
 
   
 
@@ -261,11 +263,11 @@ return (int)(value ^ (value >>> 32));
 
   
 
-### 二、优化方案
+#### 二、优化方案
 
   
 
-#### 1. 预设初始容量（收益最大、改动最小）
+**1. 预设初始容量（收益最大、改动最小）**
 
   
 
@@ -297,7 +299,7 @@ Map<Long, User> cache = Maps.newHashMapWithExpectedSize(500_000);
 
   
 
-#### 2. 选用更合适的容器
+**2. 选用更合适的容器**
 
   
 
@@ -311,7 +313,7 @@ Map<Long, User> cache = Maps.newHashMapWithExpectedSize(500_000);
 
   
 
-#### 3. 数据库加载侧优化
+**3. 数据库加载侧优化**
 
   
 
@@ -329,7 +331,7 @@ List<User> batch = userMapper.selectAll(); // 一次性 SELECT *，或按 10w �
 
 ```
 
-  
+  [[MySQL JDBC 驱动提供的两种[流式读取]机制]]
 
 - 使用 **`ResultSet` 流式读取**（MySQL 驱动设置 `useCursorFetch=true` 或 `Statement.setFetchSize(Integer.MIN_VALUE)`），避免一次性把 50w 条加载进 JDBC 内存；
 
@@ -339,7 +341,7 @@ List<User> batch = userMapper.selectAll(); // 一次性 SELECT *，或按 10w �
 
   
 
-#### 4. 并行加载
+**4. 并行加载**
 
   
 
@@ -379,7 +381,7 @@ DB 端配合主键索引范围扫描，整体耗时基本等于 `单分片耗时
 
   
 
-#### 5. Hash 冲突的针对性处理
+**5. Hash 冲突的针对性处理**
 
   
 
@@ -403,7 +405,7 @@ return h ^ (h >>> 16) ^ (h >>> 8); // 额外扰动
 
   
 
-#### 6. 是否真的需要全量加载到内存？
+**6. 是否真的需要全量加载到内存？**
 
   
 
@@ -437,7 +439,7 @@ LoadingCache<Long, User> cache = Caffeine.newBuilder()
 
   
 
-### 三、优化收益预估
+#### 三、优化收益预估
 
   
 
@@ -452,7 +454,12 @@ LoadingCache<Long, User> cache = Caffeine.newBuilder()
 实践中**最先做的两件事是「预设容量」和「批量查询 + 并行」**，这两步通常就能把启动时间压到 2 秒以内，再考虑是否引入专用容器或架构调整。
 
 
+
 4. 同事写了 `String s = "a" + i + "b" + j;` 在循环里拼接 10 万次出现 CPU 飙高，请解释 JDK 8 与 JDK 17 下编译器分别如何处理，以及你会怎么改写。
+
+[[03-Java/循环内字符串拼接性能分析（JDK 8 vs JDK 17）|循环内字符串拼接性能分析（JDK 8 vs JDK 17）]]
+
+
 
 5. 接口入参里有 `BigDecimal amount`，财务对账时出现 `0.1+0.2 != 0.3`，请说明 `BigDecimal` 的正确构造方式（字符串 vs double）以及 `setScale` 的舍入模式选择。
 

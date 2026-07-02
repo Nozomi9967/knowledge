@@ -463,7 +463,156 @@ LoadingCache<Long, User> cache = Caffeine.newBuilder()
 
 5. 接口入参里有 `BigDecimal amount`，财务对账时出现 `0.1+0.2 != 0.3`，请说明 `BigDecimal` 的正确构造方式（字符串 vs double）以及 `setScale` 的舍入模式选择。
 
+
+### 题5解析
+
+#### **务必用 `new BigDecimal(String)` 构造，财务场景统一使用 `RoundingMode.HALF_EVEN`（银行家舍入）做 `setScale`。**
+
+  
+
+#### **为什么 `0.1 + 0.2 != 0.3`**
+
+  
+
+`double` 是 IEEE 754 二进制浮点数，`0.1`、`0.2`、`0.3` 都无法被精确表示。`0.1` 实际存储约为 `0.1000000000000000055511151231257827021181583404541015625`。把这种"已经有误差"的 `double` 喂给 `BigDecimal`，误差会被原样保留下来——这正是对账出现尾差的根因。
+
+  
+
+#### **`BigDecimal` 的正确构造方式**
+
+  
+
+```java
+
+// ❌ 错误：double 入参会把二进制误差带进来
+
+new BigDecimal(0.1);
+
+// => 0.1000000000000000055511151231257827021181583404541015625
+
+  
+
+// ✅ 正确：字符串构造，所见即所得
+
+new BigDecimal("0.1");
+
+// => 0.1
+
+  
+
+// ✅ 也可以：BigDecimal.valueOf(double) 内部走 Double.toString,等价于字符串
+
+BigDecimal.valueOf(0.1); // => 0.1
+
+```
+
+  
+
+**对接口入参 `BigDecimal amount` 的几点纪律**：
+
+  
+
+- **入口层用 `String` 接收金额，再转 `BigDecimal`**。如果上游用 JSON，Jackson 默认会用 `double` 中转,需开启 `DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS`，或者干脆把 DTO 字段定义成 `String`，进服务层再 `new BigDecimal(str)`。
+
+- **永远不要 `new BigDecimal(double)`**,Sonar/Checkstyle 应作为强制规则禁用。
+
+- **比较金额用 `compareTo` 而不是 `equals`**,`equals` 会把 `1.0` 和 `1.00` 视为不等（scale 不同）。
+
+- **除法必须显式给 scale 和 RoundingMode**,否则除不尽时抛 `ArithmeticException`。
+
+  
+
+#### **`setScale` 舍入模式选择**
+
+  
+
+| 模式 | 行为 | 适用场景 |
+
+|---|---|---|
+
+| `HALF_UP` | 四舍五入（0.5 进位） | 直觉常见，但大批量数据会系统性偏高 |
+
+| `HALF_DOWN` | 五舍六入（0.5 舍去） | 系统性偏低，几乎不用 |
+
+| `HALF_EVEN` | 银行家舍入：0.5 时向偶数靠 | **财务对账首选**，长期统计期望无偏 |
+
+| `DOWN` / `FLOOR` | 向零/向下截断 | 计费向用户少收（让利）、利息计提 |
+
+| `UP` / `CEILING` | 向远离零/向上进位 | 平台手续费向自己多收 |
+
+| `UNNECESSARY` | 断言无需舍入，否则抛异常 | 校验中间结果是否已对齐 scale |
+
+  
+
+**为什么财务推荐 `HALF_EVEN`**：在 `HALF_UP` 下，`0.5、1.5、2.5、3.5` 全部进位，累加后系统性高估；`HALF_EVEN` 让 `0.5→0`、`1.5→2`、`2.5→2`、`3.5→4`,统计期望为零偏差。这是 IEEE 754 默认舍入模式，也是中国《GB/T 8170》推荐的"四舍六入五成双"。
+
+  
+
+```java
+
+BigDecimal a = new BigDecimal("0.1");
+
+BigDecimal b = new BigDecimal("0.2");
+
+BigDecimal sum = a.add(b).setScale(2, RoundingMode.HALF_EVEN);
+
+// => 0.30,且 sum.compareTo(new BigDecimal("0.3")) == 0
+
+```
+
+  
+
+#### **一份可直接落地的最小规约**
+
+  
+
+```java
+
+public final class Money {
+
+public static final int SCALE = 2; // 元,分两位
+
+public static final RoundingMode RM = RoundingMode.HALF_EVEN;
+
+  
+
+public static BigDecimal of(String v) {
+
+return new BigDecimal(v).setScale(SCALE, RM);
+
+}
+
+public static BigDecimal add(BigDecimal a, BigDecimal b) {
+
+return a.add(b).setScale(SCALE, RM);
+
+}
+
+public static BigDecimal divide(BigDecimal a, BigDecimal b) {
+
+return a.divide(b, SCALE, RM); // 必须给 scale
+
+}
+
+public static boolean eq(BigDecimal a, BigDecimal b) {
+
+return a.compareTo(b) == 0; // 不要用 equals
+
+}
+
+}
+
+```
+
+  
+
+补一句额外的工程建议：如果业务涉及汇率、利率这种需要更高精度的中间计算，可以把中间态 scale 放宽到 6\~8 位，只在**落库**和**对外输出**时再 `setScale(2, HALF_EVEN)`,这样能避免中间多次舍入造成的累积误差。
+
+
+
 6. 给定一个 `List<Order>`，需要按 `userId` 分组、组内按 `createTime` 倒序、再取每组前 3 条。请用 Stream API 实现，并讨论该写法在百万级数据下的性能问题。
+
+[[题6题解]]
 
 ---
 
@@ -471,19 +620,362 @@ LoadingCache<Long, User> cache = Caffeine.newBuilder()
 
 7. 一个秒杀接口使用 `synchronized` 锁住整个方法导致 QPS 只有 200。请提出至少三种优化方案（分段锁、`ReentrantLock` + `tryLock`、Redis 分布式锁、本地库存预扣）并比较。
 
+[[题7题解]]
+
 8. 线上发现 `ThreadPoolExecutor` 的任务被悄悄丢弃，排查发现使用了默认 `AbortPolicy` 但被业务 catch 吞掉。请讲清楚四种拒绝策略的适用场景，以及你会如何设计一个"既不丢任务又不压垮系统"的方案。
+
+**四种拒绝策略**
+
+**AbortPolicy（默认）**，直接抛出 `RejectedExecutionException`。适合调用方能感知异常、需要快速失败的场景。但我们这次线上问题就是它的坑——业务代码有个大 catch 把异常吞掉了，任务静默消失，没有任何日志，很难排查。
+
+**CallerRunsPolicy**，让提交任务的线程自己去执行这个任务。好处是绝对不丢任务，同时天然产生反压，调用方变慢了，自然就减缓了任务提交速度。缺点是如果调用方是 Tomcat 的 IO 线程，阻塞住了会导致大量请求超时，比丢任务还严重。
+
+**DiscardPolicy**，静默丢弃新提交的任务，什么都不做。适合允许丢失的场景，比如埋点上报、日志采样。问题是完全没有任何反压信号，系统过载了你都不知道。
+
+**DiscardOldestPolicy**，丢掉队列里等待最久的那个任务，然后把新任务放进去。适合只关心最新数据的场景，比如实时行情、传感器采样。但要想清楚业务语义——你丢的是已经等了最久的任务，用户可能早就在等结果了。
+
+---
+
+**既不丢任务又不压垮系统的方案**
+
+核心思路是**分级降级加全程可观测**，分三级。
+
+**第一级**，主池队列用有界队列，队列满触发自定义拒绝处理器，先尝试 offer 到一个二级缓冲队列，非阻塞，成功就返回。同时有一个后台 drainer 线程定期把二级缓冲里的任务重新喂回主池，每次限量，避免瞬间打爆。
+
+**第二级**，二级缓冲也满了，就带 200 毫秒超时重新 offer 主队列，给主池一个喘息机会。
+
+**第三级**，还是进不去，才走 CallerRuns 兜底，保证任务绝对不丢。同时在这一步触发告警，因为走到这里说明系统已经在过载边缘了。
+
+**为什么不一开始就用 CallerRuns？** 因为二级缓冲把反压推迟到真正无路可退才触发，避免过早阻塞调用方线程。告警阈值应该设在二级缓冲积压超过某个水位就报警，不要等到第三级才发现。
+
+二级缓冲用的是 `LinkedBlockingQueue.offer(task)`，不带超时参数，队列没满就直接入队返回 true，满了立刻返回 false，不会阻塞调用线程。所以拒绝处理器能快速判断——成功了就直接返回，任务交给 drainer 后续处理；失败了才继续走第二级降级。
+
+这里用 offer 而不是 put，就是为了保证拒绝处理器本身不会卡住，否则拒绝处理器阻塞，主池线程也跟着阻塞，反而加剧过载。
+
+
+告警不应该等到第三级 CallerRuns 才触发，那时候已经在压垮系统的边缘了。正确的做法是在二级缓冲积压超过水位线的时候就提前告警，比如二级缓冲用了 80% 就报警，让运维有时间介入。第三级 CallerRuns 是最后的兜底保障，保证任务不丢，但走到这一步说明告警早就应该响了。
+
 
 9. 使用 `CompletableFuture` 并行调用三个下游服务（商品、库存、营销），任意一个超时整体接口要降级返回。请写出核心代码骨架，并说明 `allOf`、`anyOf`、`orTimeout` 的用法。
 
+
+[[CompletableFuture]]
+
+
 10. `ThreadLocal` 在使用了线程池的 Web 容器中导致用户信息串号，请分析根因，并对比 `InheritableThreadLocal`、`TransmittableThreadLocal`（阿里 TTL）的差异。
+
+**线程池复用线程导致 ThreadLocal 残留，必须在 finally 中 remove；InheritableThreadLocal 只在子线程创建时拷贝一次，对线程池无效；TTL 通过装饰 Runnable，在任务提交时快照、执行前 replay、执行后 restore，才真正解决了池化场景下的上下文透传。**
+
+  
+
+下面我按面试口述的节奏展开，分四块讲。
+
+  
+
+---
+
+  
+
+**第一块，先讲根因。**
+
+  
+
+ThreadLocal 的本质是每个 Thread 对象内部有一个 `ThreadLocalMap`，key 是 ThreadLocal 实例的弱引用，value 就是我们 set 进去的对象。也就是说，数据是挂在「线程」这个载体上的，不是挂在「请求」上的。
+
+  
+
+在传统的 one-thread-per-request 模型里没问题，请求结束线程就销毁了。但 Web 容器比如 Tomcat 用的是线程池，线程会被复用。典型的串号场景是这样的：
+
+  
+
+- 请求 A 进来，拦截器在 Thread-1 上 `userHolder.set(userA)`，业务跑完返回，但是**没有调用 remove**。
+
+- 请求 B 进来，调度器又把它分配到了同一个 Thread-1，业务代码里如果某个分支没有重新 set（比如游客接口、异步回调、或者 set 在某个 if 里），那 `userHolder.get()` 拿到的就是上一个请求 A 残留的 userA。
+
+  
+
+所以根因一句话：**ThreadLocal 的生命周期绑定的是线程，而线程池里线程的生命周期远长于一次请求**，残留数据没清理就被下一个请求读到了。
+
+  
+
+修复办法也很直接：在过滤器或拦截器的 `finally` 块里强制 `remove()`，Spring 的 `RequestContextHolder`、MDC 都是这么做的。
+
+  
+
+---
+
+  
+
+**第二块，InheritableThreadLocal。**
+
+  
+
+它解决的是另一个问题：**父线程能不能把上下文传给子线程**。
+
+  
+
+实现机制是在 `new Thread()` 的构造函数里，会去检查父线程的 `inheritableThreadLocals`，如果不为空就浅拷贝一份给子线程。注意关键词——**线程创建的那一刻拷贝**。
+
+  
+
+所以它的局限性也很明显：在线程池场景下完全失效。因为线程池里的线程是**复用的**，不是每次任务都 new 一个新线程。线程是在池子初始化时创建的，那一刻拷贝的是初始化线程（通常是 main 或者容器启动线程）的上下文，跟你后面提交任务时的业务线程上下文毫无关系。
+
+  
+
+所以 InheritableThreadLocal 只适合「显式 new Thread」或者 ForkJoin 这种场景，不适合业务线程池。
+
+  
+
+---
+
+  
+
+**第三块，TransmittableThreadLocal（TTL）。**
+
+  
+
+阿里搞 TTL 就是为了补 InheritableThreadLocal 在池化场景下的缺口。核心思路是：**既然线程复用导致拷贝时机不对，那就把拷贝时机从"线程创建时"挪到"任务提交时"**。
+
+  
+
+它的工作流程（口述顺序很重要）：
+
+  
+
+1. **提交任务时 capture**：在主线程调用 `TtlRunnable.get(runnable)` 包装时，把当前线程所有 TTL 变量的值快照下来，挂在这个 Runnable 上。
+
+2. **执行任务前 replay**：池里的工作线程开始跑这个 Runnable，先把快照里的值 set 到当前线程的 TTL 里，并备份工作线程原有的值。
+
+3. **执行任务后 restore**：任务跑完，把备份的原值还原回去，避免污染线程池里的下一个任务。
+
+  
+
+这三步对应源码里的 `capture / replay / restore`。再配合 `TtlExecutors.getTtlExecutorService()` 或者 Java Agent 字节码增强，业务代码基本无侵入。
+
+  
+
+---
+
+  
+
+**第四块，三者对比（口述时我会简单带过）。**
+
+  
+
+| 维度 | ThreadLocal | InheritableThreadLocal | TransmittableThreadLocal |
+
+|---|---|---|---|
+
+| 跨线程传递 | 不支持 | 支持，仅 new Thread 时 | 支持，任务提交时 |
+
+| 线程池场景 | 需手动 remove | **失效**（线程复用） | **正确工作** |
+
+| 拷贝时机 | 无 | 线程创建 | 任务提交（capture） |
+
+| 任务结束清理 | 需手动 | 不清理 | 自动 restore |
+
+  
+
+---
+
+  
+
+**最后收个尾**，面试官如果追问，可以补一句：即使用了 TTL，**ThreadLocal 本身在请求结束时 remove 的纪律依然不能丢**，否则不仅串号，还可能因为 ThreadLocalMap 的 Entry key 是弱引用、value 是强引用导致内存泄漏，这是另一个高频考点。
+
+
+
+>InheritableThreadLocal
+
+
+它是 JDK 在 `java.lang` 包里自带的类，直接继承自 `ThreadLocal`，重写了三个方法：`childValue`、`getMap`、`createMap`。
+
+它要解决的核心问题是：**普通 ThreadLocal 在父子线程之间是隔离的**——主线程 set 的值，子线程 get 不到。而很多场景下我们希望子线程能继承父线程的上下文，比如 traceId、用户身份。
+
+实现机制讲三个点：
+
+第一，Thread 类里除了 `threadLocals`，还有一个独立的字段 `inheritableThreadLocals`，专门给它用。
+
+第二，关键时机在 `new Thread()` 的构造函数里。它会检查**当前线程（也就是创建子线程的那个父线程）​**的 `inheritableThreadLocals` 是否为空，不为空就调用 `ThreadLocal.createInheritedMap()`，把父线程的 Map 浅拷贝一份给子线程。
+
+第三，拷贝时会走 `childValue(parentValue)` 这个钩子方法，默认实现就是直接返回 parentValue，你可以重写它做深拷贝。
+
+它的致命局限：**拷贝动作只发生在 `new Thread` 的那一瞬间**​。在线程池场景下，线程是池子初始化时就创建好的，那个时刻拷贝的是初始化线程（通常是 main 或容器启动线程）的上下文，后面你再往主线程 set 任何东西，池里的工作线程都感知不到。所以它**只适合显式 new Thread 的场景**，比如手写一个 `new Thread(runnable).start()`，对 `ExecutorService` 完全无效。
+
+
+> TransmittableThreadLocal（TTL）​
+
+阿里中间件团队开源的，GitHub 上叫 `alibaba/transmittable-thread-local`，简称 TTL。它继承自 `InheritableThreadLocal`，所以 new Thread 场景天然兼容；真正的价值是补上了**线程池场景**的窟窿。
+
+核心思路一句话：**既然线程是复用的、拷贝时机不能再放在「线程创建时」，那就挪到「任务提交时」​**。
+
+它的工作流程是经典的 `capture → replay → restore` 三步：
+
+1. **capture（提交时）​**：主线程调用 `TtlRunnable.get(runnable)` 把任务包一层，包装的瞬间把当前线程所有 TTL 变量的值快照下来，挂在这个 Runnable 实例上。
+2. **replay（执行前）​**：池里的工作线程拿到这个 TtlRunnable 开始跑，先把工作线程原有的 TTL 值备份起来，然后把快照里的值 set 到当前线程，这样业务代码 `get()` 拿到的就是提交时刻主线程的上下文。
+3. **restore（执行后）​**：任务跑完，把刚才备份的原值还原回去，防止污染线程池里下一个任务。
+
+落地方式有两种：一种是手动用 `TtlRunnable`、`TtlCallable` 包装任务，或者用 `TtlExecutors.getTtlExecutorService()` 包装线程池，业务代码自动透传；另一种是挂 Java Agent（`-javaagent:transmittable-thread-local-x.x.x.jar`），通过字节码增强让 JDK 的 `ThreadPoolExecutor`、`ForkJoinPool` 自动具备 TTL 能力，对业务零侵入。
+
+典型使用场景：分布式链路追踪的 traceId、压测标记、租户 ID、灰度标签——这些数据需要从 Web 入口线程透传到业务线程池、异步任务、甚至 `CompletableFuture` 里的回调线程。
+
 
 11. 一段双重检查锁定（DCL）单例代码没有加 `volatile`，在压测中偶现 NPE，请从 JMM 指令重排序角度解释，并给出三种线程安全单例实现。
 
+不加volatile的DCL问题根源在于对象创建不是原子操作。`instance = new Singleton()`这一行在JMM层面会被拆解成三个步骤：
+
+1. 分配内存空间
+2. 在分配的内存上初始化对象（执行构造函数）
+3. 将instance引用指向这块内存地址
+
+在没有volatile约束的情况下，JIT编译器和CPU为了优化性能，可能对2和3进行指令重排序，变成1-3-2的执行顺序。也就是说引用已经指向了内存地址，但对象的构造函数还没真正执行完。
+
+这时候如果线程A正好执行到重排序后的步骤3和2之间，instance已经不为null了；线程B这时进来做第一次null检查，发现instance不为null，直接返回这个引用——但实际上对象还没初始化完成，线程B拿到的是一个"半初始化"的对象。如果线程B紧接着调用这个对象的方法或访问字段，就可能触发NPE或者拿到字段的默认值（比如0、null），这就是压测中偶现NPE的根本原因。这本质上是一个可见性和有序性问题，加上volatile之后，它会通过插入内存屏障禁止这种重排序，保证步骤2一定先于步骤3完成。
+
+三种线程安全的实现方式：
+
+第一种是修复后的DCL，给instance加上volatile：
+
+```java
+public class Singleton {
+    private static volatile Singleton instance;
+    
+    private Singleton() {}
+    
+    public static Singleton getInstance() {
+        if (instance == null) {
+            synchronized (Singleton.class) {
+                if (instance == null) {
+                    instance = new Singleton();
+                }
+            }
+        }
+        return instance;
+    }
+}
+```
+
+第二种是静态内部类（懒加载占位符模式），利用类加载机制保证线程安全，且不需要synchronized带来的性能开销：
+
+```java
+public class Singleton {
+    private Singleton() {}
+    
+    private static class Holder {
+        private static final Singleton INSTANCE = new Singleton();
+    }
+    
+    public static Singleton getInstance() {
+        return Holder.INSTANCE;
+    }
+}
+```
+
+这种方式的原理是Java类加载是懒加载的，Holder类只有在第一次调用getInstance()时才会被加载，而类加载过程本身由JVM保证线程安全（类加载阶段会加锁），所以不需要任何额外的同步开销。
+
+> 补充：说"Java类加载是懒加载的"没问题，但要注意粒度——**所有类都是按需加载的**，这不是静态内部类的专利。静态内部类的特殊之处在于它比外层类**多了一层延迟**：外层类可能因为其他原因被加载（比如有个`static`字段、反射等），但内部类`Holder`可以纹丝不动，直到`getInstance()`真正被调用时才加载。所以真正让Holder模式成立的，不是"类加载本身是懒的"，而是**内部类可以比外层类更晚加载**。
+
+第三种是枚举单例，是《Effective Java》推荐的写法，天然防止反射攻击和反序列化破坏单例：
+
+```java
+public enum Singleton {
+    INSTANCE;
+    
+    public void doSomething() {
+        // 业务逻辑
+    }
+}
+```
+
+枚举的实例化由JVM保证只发生一次，而且枚举类的反序列化不会调用构造方法而是直接返回已有的枚举实例，所以它能防住DCL和静态内部类方式都防不住的反射、反序列化攻击。
+
+面试时如果还有时间，可以补充一点：volatile在这里其实承担了两个作用，一是保证可见性（一个线程修改instance后，对其他线程立即可见），二是通过禁止指令重排序保证有序性，这也是面试官经常会追问"volatile到底解决了什么问题"的地方，单纯说"防止重排序"不够全面。
+
 12. 业务方反馈接口偶尔卡 30 秒后恢复，jstack 显示大量线程 `BLOCKED` 在 `log4j` 上。请说明可能原因以及如何用 `Async Appender` 优化。
+
+**现象分析**
+
+接口偶尔卡30秒后自动恢复，jstack显示大量线程BLOCKED在log4j——这是一个非常典型的日志同步写入引发的"假死"问题，定位思路可以这样展开。
+
+**一、为什么会BLOCKED在log4j**
+
+默认情况下log4j（无论是log4j1还是log4j2的同步Appender模式）的日志输出是同步阻塞的，也就是业务线程调用`logger.info(...)`这行代码时，是当前线程亲自去执行"格式化日志内容 + 写磁盘/写网络"这个完整流程，写完才能返回，继续往下执行业务逻辑。
+
+而日志的底层Appender往往不是单纯的本地磁盘写入，常见的几种慢场景包括：写入网络文件系统（NFS）、日志输出到远程ELK/Logstash（Socket Appender）、磁盘本身因为别的进程占用导致IO竞争、又或者是日志文件所在磁盘满了导致写入被卡住重试。一旦底层IO变慢或卡顿，所有调用了log.info/log.error的业务线程都会阻塞在这次写操作上。
+
+更关键的是，log4j的Appender内部对日志写入操作通常加了锁（保证日志顺序和文件写入的原子性），这意味着不仅仅是"我这个线程的日志写得慢"，而是所有线程在抢这同一把锁时全部排队阻塞，哪怕日志内容很短，只要持锁线程卡住了，后面成百上千个线程全部BLOCKED，表现出来就是整个接口集体卡顿。30秒这个数字通常和某个超时重试机制吻合，比如网络存储抖动、连接池超时重连等，超时之后写入恢复，锁释放，所有线程瞬间被唤醒继续执行，于是表现为"卡30秒后恢复"。
+
+简单说，根因是：业务线程的执行路径里混入了一次不可控的同步IO操作，而这个IO操作还被一把全局锁保护着，导致故障从"单点慢"放大成"全局假死"。
+
+**二、用AsyncAppender优化的思路**
+
+核心思路是把日志的"产生"和"落盘"这两件事解耦，业务线程只负责把日志事件丢进一个内存队列，立刻返回继续执行业务逻辑；真正的格式化、写磁盘/写网络这些慢操作交给一个独立的后台线程异步消费队列来做。这样业务线程的阻塞时间从"一次完整IO"降低到"一次入队操作"，即便后端日志存储抖动，最多是队列堆积，不会直接拖死业务线程。
+
+以Log4j2为例（生产中现在更常用），有两种典型配置方式。
+
+第一种是用基于LMAX Disruptor的全局异步Logger，性能最好，需要引入disruptor依赖，在log4j2.xml里配置：
+
+```xml
+<Configuration>
+    <Appenders>
+        <RollingFile name="FileAppender" fileName="logs/app.log" ...>
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger - %msg%n"/>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <AsyncRoot level="info">
+            <AppenderRef ref="FileAppender"/>
+        </AsyncRoot>
+    </Loggers>
+</Configuration>
+```
+
+并在启动参数里指定全局异步模式：
+
+```
+-Dlog4j2.contextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
+```
+
+这种方式下所有日志都走异步队列，吞吐量最高，但需要注意系统崩溃时队列里未落盘的日志可能丢失，需要权衡可靠性和性能。
+
+第二种是局部使用AsyncAppender包装原有的同步Appender，改造成本更低，适合只想异步化部分日志的场景：
+
+```xml
+<Configuration>
+    <Appenders>
+        <RollingFile name="FileAppender" fileName="logs/app.log" .../>
+        <Async name="AsyncFileAppender">
+            <AppenderRef ref="FileAppender"/>
+            <BufferSize>8192</BufferSize>
+        </Async>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="AsyncFileAppender"/>
+        </Root>
+    </Loggers>
+</Configuration>
+```
+
+**三、用AsyncAppender之后仍然要注意的点**
+
+异步化解决了业务线程被同步IO拖死的问题，但引入了新的风险点，面试或者实际排查时最好一并提到。
+
+队列是有界的，默认BufferSize通常是固定大小（比如AsyncAppender默认128或几千不等，视实现而定），如果日志产生速度长期大于消费速度（后端写入持续慢、磁盘持续IO瓶颈），队列会被打满。打满之后的默认策略有几种：阻塞（这种情况下又会退化回类似同步阻塞的问题，只是阈值变大了）、丢弃（DiscardingAsyncQueueFullPolicy，丢弃低优先级日志保留ERROR级别，可能丢失部分日志细节）。需要根据业务对日志完整性的容忍度去配置合适的策略和队列大小。
+
+另外异步意味着应用崩溃（比如OOM、kill -9）时，队列里还没来得及写盘的日志会丢失，这点在排查"为什么日志缺失了一段"时很容易被遗漏，需要提前和业务方说明这个trade-off，或者结合监控队列堆积长度（很多APM工具可以监控AsyncAppender队列水位）来提前预警IO瓶颈，而不是被动等到队列打满才发现问题。
+
+所以一个更完整的回答应该是：异步化解决了"阻塞传导到业务线程"这个直接症状，但根因（比如远程日志存储不稳定、磁盘IO瓶颈）仍然需要单独定位和解决，AsyncAppender更像是给业务线程加了一层缓冲垫，而不是从根本上修复了底层IO的性能问题。
 
 13. `AQS` 是如何实现 `ReentrantLock` 的公平锁与非公平锁的？如果让你设计一个"读写都可重入、写优先"的锁，你会怎么基于 AQS 实现？
 
+[[题13题解]]
+
+[[ReentrantReadWriteLock 完整详解]]
+
+
 14. 线上 CPU 100%，`top -Hp` 发现是 GC 线程，jstat 显示 Full GC 每分钟 5 次。请描述完整排障步骤（从 `top` 到 `jmap` 到 MAT 分析 dump）。
+
+[[Full GC频繁导致CPU 100%的完整排障流程]]
 
 ---
 
@@ -491,13 +983,29 @@ LoadingCache<Long, User> cache = Caffeine.newBuilder()
 
 15. 一个 4C8G 的容器跑 Spring Boot 应用，频繁 OOMKilled 但堆内存只用了 2G。请列出堆外内存可能的泄漏点（DirectByteBuffer、Netty、JNI、Metaspace、线程栈）以及排查工具。
 
+[[题15题解]]
+
 16. 服务启动 5 分钟内响应慢，之后恢复正常。请从 JIT 编译（C1/C2）、类加载、连接池预热三方面解释，并给出预热方案。
+
+[[题16题解]]
 
 17. 选择 G1 还是 ZGC？请基于"堆 32G、要求 STW < 50ms、对吞吐敏感"的场景做出选择并说明参数调优要点（`MaxGCPauseMillis`、`G1HeapRegionSize` 等）。
 
+[[G1]]
+[[ZGC]]
+[[题17题解]]
+
+
+
 18. 线上 dump 文件 8G 拉不到本地，请说明如何在服务器上用 `jmap -histo:live`、`jcmd GC.class_histogram`、`arthas` 做轻量分析。
 
+[[题18题解]]
+
+
+
 19. `String.intern()` 在 JDK 7+ 放在堆里，业务中大量调用导致 YGC 飙升。请解释字符串常量池机制，并给出替代方案。
+
+[[题19题解]]
 
 ---
 
@@ -505,13 +1013,23 @@ LoadingCache<Long, User> cache = Caffeine.newBuilder()
 
 20. `@Transactional` 标注的方法内部调用另一个 `@Transactional(propagation=REQUIRES_NEW)` 方法，发现事务没生效。请解释 Spring AOP 自调用失效的原理，并给出三种解决办法。
 
+[[题20题解]]
+
 21. 一个 `@Async` 方法抛出的异常上游捕获不到，且和主线程 ThreadLocal 不共享。请说明 `@Async` 的实现原理与正确的异常处理方式。
+
+[[题21题解]]
 
 22. Spring Boot 启动时报 `BeanCurrentlyInCreationException`，请分析循环依赖的三级缓存机制，以及为什么构造器注入解决不了循环依赖。
 
+[[题22题解]]
+
 23. 你需要在不停机的前提下，动态调整某个限流阈值。请基于 `@ConfigurationProperties` + `@RefreshScope` + Nacos 设计方案，并说明刷新时机与坑点。
 
+[[题23题解]]
+
 24. Spring Cloud Gateway 中如何实现"按用户ID限流 + 按接口限流 + 黑名单"的组合过滤器？请给出 `GlobalFilter` 的执行顺序设计。
+
+[[题24题解]]
 
 25. 使用 MyBatis-Plus 时，分页查询 `selectPage` 返回的 total 和 records 不一致，请分析 `Count SQL` 自动生成的坑（join、group by、distinct）。
 

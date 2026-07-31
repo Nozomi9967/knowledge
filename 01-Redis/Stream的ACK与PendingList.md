@@ -60,4 +60,9 @@ consumer-A 收到订单A → 处理到一半服务器宕机 → 重启
 → 订单A 还在 Pending List 里，继续处理
 → 或者超时后被其他 consumer 用 XCLAIM 领走处理
 → 订单不会丢
+
+## 关联知识点
+
+- [[Stream消息队列]] — Redis Stream 消息队列总览
+- [[Stream的XREADGROUP三种模式]] — XREADGROUP 三种读取模式（配合 Pending List 理解模式 `0`）
 ```

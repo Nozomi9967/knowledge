@@ -2,7 +2,7 @@
 title: "Java基础面试题"
 source: "https://www.xiaolincoding.com/interview/java.html#jvm-%E5%92%8C-java-%E6%9C%89%E5%95%A5%E5%8C%BA%E5%88%AB"
 author:
-  - "[[小林coding]]"
+  - "小林coding"
 published: undefined
 created: 2026-06-04
 updated: 2026-10-08

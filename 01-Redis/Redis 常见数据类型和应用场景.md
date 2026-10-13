@@ -2,7 +2,7 @@
 title: "Redis 常见数据类型和应用场景"
 source: "[[Clippings/Redis 常见数据类型和应用场景]]"
 author:
-  - "[[小林coding]]"
+  - "小林coding"
 published: undefined
 created: 2026-05-31
 description:

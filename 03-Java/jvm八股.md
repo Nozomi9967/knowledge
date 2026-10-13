@@ -9,7 +9,7 @@ tags:
 created: 2026-06-08
 updated: 2026-10-08
 source:
-  - "[[Java虚拟机面试题]]"
+  - "[[jvm八股]]"
   - "[[jvm八股]]"
 ---
 

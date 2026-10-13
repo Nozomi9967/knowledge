@@ -2,7 +2,7 @@
 title: "多节点争抢资源， Redis 分布式锁是怎么实现的？"
 source: "[[Clippings/多节点争抢资源， Redis 分布式锁是怎么实现的？]]"
 author:
-  - "[[小林coding]]"
+  - "小林coding"
 published: undefined
 created: 2026-06-04
 description:

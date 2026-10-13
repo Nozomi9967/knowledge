@@ -2,7 +2,7 @@
 title: "Redis 过期删除策略和内存淘汰策略有什么区别？"
 source: "[[Clippings/Redis 过期删除策略和内存淘汰策略有什么区别？]]"
 author:
-  - "[[小林coding]]"
+  - "小林coding"
 published: undefined
 created: 2026-06-04
 description:

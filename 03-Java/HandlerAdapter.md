@@ -258,7 +258,7 @@ H --> I[命中的 Adapter.handle 执行 Controller]
 ## 关联知识点
 
 - [[SpringMVC]] — Spring MVC 整体架构与请求处理流程
-- [[DispatcherServlet]] — 前端控制器的初始化与策略组件加载
+- [[DispatcherServlet详解|DispatcherServlet]] — 前端控制器的初始化与策略组件加载
 - [[HandlerMapping]] — 与 HandlerAdapter 配对使用的 URL 映射组件
 - [[WebMvcAutoConfiguration]] — Spring Boot MVC 自动配置原理
 - [[WebMvcConfigurer]] — 用户自定义 MVC 配置的扩展点

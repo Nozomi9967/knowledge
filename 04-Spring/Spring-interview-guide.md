@@ -96,7 +96,7 @@ Spring 生态也很丰富：Spring Boot 快速搭建项目、Spring MVC 处理 W
 -   **session**：每个用户会话一个实例，如购物车。
 -   **application**：ServletContext 范围内单例。
 -   **websocket**：WebSocket 会话内单例。
-**注意**：singleton Bean 注入 prototype Bean 时存在"只注入一次"的坑，详见 [[2.3 singleton 注入 prototype 的问题]]。
+**注意**：singleton Bean 注入 prototype Bean 时存在"只注入一次"的坑，详见 2.3 singleton 注入 prototype 的问题。
 
 ### 2.3 singleton Bean 注入 prototype Bean 会怎样？怎么解决？
 **口述回答**：
@@ -108,7 +108,7 @@ Spring 生态也很丰富：Spring Boot 快速搭建项目、Spring MVC 处理 W
 1.  **`@Lookup` 注解**：标注在方法上，Spring 生成 CGLIB 子类重写该方法，每次调用都从容器获取新实例。
 2.  **注入 `ObjectProvider`**：延迟获取，每次调用 `getObject()` 拿新实例。
 
-**面试加分**：构造器注入解决不了这个问题，因为构造时就已经固定引用；`@Lookup` 和 ObjectProvider 的本质都是**延迟到使用时才去容器获取**，详见 [[2.4 @Lookup 和 ObjectProvider 的原理]]。
+**面试加分**：构造器注入解决不了这个问题，因为构造时就已经固定引用；`@Lookup` 和 ObjectProvider 的本质都是**延迟到使用时才去容器获取**，详见 2.4 @Lookup 和 ObjectProvider 的原理。
 
 ### 2.4 @Lookup 和 ObjectProvider 的原理是什么？
 **口述回答**：
@@ -207,7 +207,7 @@ Spring 容器保证了 Bean 创建过程线程安全，但创建后的使用过�
 **二级缓存的作用**：把第一次 `getObject()` 的结果存进二级缓存，C 索要时先查二级直接命中 → 工厂只被调用一次 → 全链路只有一个早期引用。
 
 **总结**：
--   **三级缓存**解决"拿到的和最终的是同一个"（延迟代理决策，见 [[2.7 为什么用三级缓存而不是两级？]]）
+-   **三级缓存**解决"拿到的和最终的是同一个"（延迟代理决策，见 2.7 为什么用三级缓存而不是两级？）
 -   **二级缓存**解决"工厂产物只生成一次"（缓存早期引用）
 -   两个问题互不重叠、缺一不可，所以需要三级缓存的完整形态
 

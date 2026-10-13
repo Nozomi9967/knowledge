@@ -2,7 +2,7 @@
 title: "如何保证 Redis 分布式锁的高可用和高性能？"
 source: "[[Clippings/如何保证 Redis 分布式锁的高可用和高性能？]]"
 author:
-  - "[[小林coding]]"
+  - "小林coding"
 published: undefined
 created: 2026-06-04
 description:

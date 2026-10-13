@@ -2,7 +2,7 @@
 title: "AOF 持久化是怎么实现的？"
 source: "[[Clippings/AOF 持久化是怎么实现的？]]"
 author:
-  - "[[小林coding]]"
+  - "小林coding"
 published: undefined
 created: 2026-06-03
 description:

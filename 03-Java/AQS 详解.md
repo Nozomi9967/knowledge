@@ -15,7 +15,7 @@ source: [[ReentrantLock详解]]
 
 > 拆分自 [[ReentrantLock详解]] 第 4 节「底层原理：AQS 框架」。本页展开 AQS 的三要素、CLH 队列原理、AQS 对 CLH 的改造、源码级加锁/解锁/取消、与 `synchronized` 的对照、面试话术与踩坑点。
 >
-> 反向引用：[[ReentrantLock详解]] · [[Condition 详解]] · [[Java并发编程面试题]] · [[synchronized 关键字]] · [[线程池]]
+> 反向引用：[[ReentrantLock详解]] · [[Condition 详解]] · [[Java并发编程面试题]] · [[synchronized 关键字详解|synchronized 关键字]] · [[线程池]]
 
 ---
 
@@ -1126,7 +1126,7 @@ if (shouldParkAfterFailedAcquire(p, node)) {
 - [[ReentrantLock详解]] — AQS 最重要的独占模式使用者，state=重入次数
 - [[Condition 详解]] — AQS 内部类 ConditionObject，独立详解
 - [[Java并发编程面试题]] — 并发编程主文件，多次引用 AQS
-- [[synchronized 关键字]] — 与 AQS 子类（ReentrantLock）的对比
+- [[synchronized 关键字详解|synchronized 关键字]] — 与 AQS 子类（ReentrantLock）的对比
 - [[线程池]] — ThreadPoolExecutor 的 Worker 用 AQS 独占模式
 - [[Semaphore详解]] — AQS 共享模式经典案例（已建：acquireShared / setHeadAndPropagate 链式唤醒 / 与 CountDownLatch 对比）
 - [[CountDownLatch详解]] — AQS 共享模式 + 一次性门闩（已建：`tryAcquireShared` 一行精华 + `tryReleaseShared` 防负数 + 与 CyclicBarrier 对

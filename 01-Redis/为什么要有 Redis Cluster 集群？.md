@@ -2,7 +2,7 @@
 title: "为什么要有 Redis Cluster 集群？"
 source: "[[Clippings/为什么要有 Redis Cluster 集群？]]"
 author:
-  - "[[小林coding]]"
+  - "小林coding"
 published: undefined
 created: 2026-06-04
 description:

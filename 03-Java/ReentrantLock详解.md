@@ -15,7 +15,7 @@ source: [[Java并发编程面试题]]
 
 > [[Java并发编程面试题]] 中仅给出特性提纲，本页展开讲解原理、源码、面试话术与踩坑点。
 >
-> 反向引用：[[Java并发编程面试题]] · [[synchronized 关键字]] · [[线程池]] · [[AQS 详解]]
+> 反向引用：[[Java并发编程面试题]] · [[synchronized 关键字详解|synchronized 关键字]] · [[线程池]] · [[AQS 详解]]
 
 ---
 
@@ -509,7 +509,7 @@ HotSpot AQS 作者 Doug Lea 注释里写明：在高竞争下，**非公平锁�
 - [[Java并发编程面试题]] — 主文件，本详解由其「可重入性 / 可中断性 / 超时 / 公平 / 多条件变量」段展开
 - [[AQS 详解]] — ReentrantLock 的底层框架（独立详解：CLH 队列、acquire/release/cancelAcquire 源码、共享模式、面试话术）
 - [[线程池]] — 线程池的 Worker 也基于 AQS 独占模式
-- [[synchronized 关键字]] — 与 ReentrantLock 对比的核心
+- [[synchronized 关键字详解|synchronized 关键字]] — 与 ReentrantLock 对比的核心
 - [[内存屏障和happens-before]] — 锁的内存语义来源
 - [[Redisson详解]] — 分布式场景下的 ReentrantLock 升级
 - [[Condition 详解]] — ReentrantLock 多条件变量机制独立详解（AQS 内部类 ConditionObject）

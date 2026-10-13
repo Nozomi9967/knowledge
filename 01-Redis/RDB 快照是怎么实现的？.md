@@ -2,7 +2,7 @@
 title: "RDB 快照是怎么实现的？"
 source: "[[Clippings/RDB 快照是怎么实现的？]]"
 author:
-  - "[[小林coding]]"
+  - "小林coding"
 published: undefined
 created: 2026-06-04
 description:

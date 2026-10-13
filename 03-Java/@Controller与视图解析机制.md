@@ -1056,5 +1056,5 @@ public String submit(User user, RedirectAttributes redirectAttrs) {
 ## 关联知识点
 
 - [[SpringMVC]] — 核心注解与参数绑定的完整说明
-- [[SpringBoot]] — @RestController 主要应用场景
-- [[IOC容器]] — DispatcherServlet 的初始化与Bean管理
+- [[SpringBoot 热门面试题]] — @RestController 主要应用场景
+- [[Spring ioc]] — DispatcherServlet 的初始化与Bean管理

@@ -281,4 +281,4 @@ DispatcherServlet **继承自** `HttpServlet`，重写了 `service()` 方法，�
 
 - [[SpringMVC]] — 请求处理全流程与注解详解
 - [[@Controller与视图解析机制]] — ViewResolver 与视图名解析机制
-- [[SpringBoot]] — DispatcherServlet 的自动注册配置
+- [[SpringBoot 热门面试题]] — DispatcherServlet 的自动注册配置

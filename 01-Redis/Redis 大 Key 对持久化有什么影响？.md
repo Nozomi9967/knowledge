@@ -2,7 +2,7 @@
 title: "Redis 大 Key 对持久化有什么影响？"
 source: "[[Clippings/Redis 大 Key 对持久化有什么影响？]]"
 author:
-  - "[[小林coding]]"
+  - "小林coding"
 published: undefined
 created: 2026-06-04
 description:

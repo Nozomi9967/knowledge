@@ -16,7 +16,7 @@ source: [[ReentrantLock详解]]
 
 > 拆分自 [[ReentrantLock详解]] 第 3 节「多个条件变量（Condition）」。本页展开 Condition 的原理、与 `wait/notify` 的全面对比、AQS 底层 `ConditionObject` 源码、面试话术与踩坑点。
 >
-> 反向引用：[[ReentrantLock详解]] · [[AQS 详解]] · [[Java并发编程面试题]] · [[synchronized 关键字]] · [[线程池]]
+> 反向引用：[[ReentrantLock详解]] · [[AQS 详解]] · [[Java并发编程面试题]] · [[synchronized 关键字详解|synchronized 关键字]] · [[线程池]]
 
 ---
 
@@ -414,6 +414,6 @@ while (count == 0) notEmpty.await();
 - [[ReentrantLock详解]] — Condition 绑定的 Lock 实现，包含四大特性 + AQS 源码
 - [[AQS 详解]] — ConditionObject 是 AQS 内部类，理解 CLH 队列很关键
 - [[Java并发编程面试题]] — 线程间通信方式总览，Condition 是其中一种
-- [[synchronized 关键字]] — Condition 是 `wait/notify` 的升级替代
+- [[synchronized 关键字详解|synchronized 关键字]] — Condition 是 `wait/notify` 的升级替代
 - [[线程池]] — `LinkedBlockingQueue` 内部就用 Condition 做 put/take 同步
 - [[阻塞队列详解]] — ArrayBlockingQueue / LinkedBlockingQueue / SynchronousQueue / DelayQueue / PriorityBlockingQueue 五大实现 + Condition 应用（已建）

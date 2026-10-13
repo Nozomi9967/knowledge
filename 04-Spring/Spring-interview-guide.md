@@ -1,6 +1,7 @@
 ---
-背诵状态: 背诵中
+背诵状态: 已完成
 背诵开始: 2026-08-07 16:26
+背诵结束: 2026-08-10 14:46
 ---
 # Spring 后端开发面试热门面试题（详细口述版）
 
@@ -304,14 +305,14 @@ Spring 在 `TransactionDefinition` 中定义五种：
 
 ### 5.1 Spring MVC 的核心组件有哪些？
 **口述回答**：
--   **DispatcherServlet**：前端控制器，统一入口，Spring Boot 自动注册并映射到 `/`。
--   **HandlerMapping**：处理器映射，根据 URL 和请求方法找到对应的 Controller 方法（RequestMappingHandlerMapping 解析 `@RequestMapping`）。
--   **Handler**：处理器，即 Controller 方法。
--   **HandlerAdapter**：处理器适配器，统一调用不同类型处理器并处理参数绑定、类型转换（RequestMappingHandlerAdapter）。
--   **ViewResolver**：视图解析器，前后端分离时主要用于返回 JSON。
--   **HandlerExceptionResolver**：异常处理器，配合 `@ControllerAdvice` + `@ExceptionHandler` 统一异常处理。
--   **MultipartResolver**：文件上传解析器。
--   **HandlerInterceptor**：拦截器。
+-   **DispatcherServlet**：DispatcherServlet 是 Spring MVC 的前端控制器，所有请求的统一入口。它本质上是一个 Servlet，Spring Boot 启动时会自动把它注册到内嵌的 Tomcat 上，并配置成处理所有请求。它自己不处理业务，只负责分发调度——根据 URL 找到对应的 Controller 方法，调用完再把结果返回。
+-   **HandlerMapping**：处理器映射，负责**查路由**——根据请求的 URL 和请求方法，找到处理它的那个 Controller 方法，并连同匹配的拦截器一起封装成**处理器执行链（HandlerExecutionChain）**返回（具体是 RequestMappingHandlerMapping 在解析 `@RequestMapping` 注解）。
+-   **Handler**：处理器，即处理当前请求的业务逻辑单元——通常是 HandlerMapping 根据请求**解析匹配到的 Controller 方法**（也可能是一个实现 Controller 接口或 HttpRequestHandler 的类），Spring MVC 支持多种风格的处理器。
+-   **HandlerAdapter**：处理器适配器，负责**调用处理器**——屏蔽不同处理器风格的调用差异，统一执行参数绑定、类型转换、调用 Controller 方法并处理返回值（RequestMappingHandlerAdapter 对应注解式 Controller）。
+-   **ViewResolver**：视图解析器，负责**解析视图**——把 Controller 返回的逻辑视图名解析成真正的 View 对象进行渲染；前后端分离时主要用它返回 JSON。
+-   **HandlerExceptionResolver**：异常处理器，统一处理请求过程中的异常，配合 `@ControllerAdvice` + `@ExceptionHandler` 用。
+-   **MultipartResolver**：文件上传解析器，把 multipart 格式的请求（文件上传）解析成可用的对象。
+-   **HandlerInterceptor**：拦截器，请求进 Controller 前后做横切处理，比如登录校验、日志。
 
 ### 5.2 说一下 Spring MVC 的工作流程？
 **口述回答**：
@@ -330,7 +331,7 @@ Spring 在 `TransactionDefinition` 中定义五种：
 
 ### 5.4 过滤器和拦截器有什么区别？
 **口述回答**：
--   **规范不同**：过滤器是 Servlet 规范（javax.servlet.Filter，Spring Boot 3.x 为 jakarta.servlet.Filter），拦截器是 Spring MVC（HandlerInterceptor）。
+-   **规范不同**：过滤器是 Servlet 规范（javax.servlet.Filter，Spring Boot 3.x 为 jakarta.servlet.Filter）；拦截器是 Spring MVC 框架提供的组件（HandlerInterceptor 接口），不依赖 Servlet 规范。
 -   **作用范围**：过滤器对所有请求包括静态资源生效，拦截器只拦截 Spring MVC 控制器请求。
 -   **执行顺序**：完整链路 Filter 前置 → DispatcherServlet → Interceptor.preHandle → Controller → Interceptor.postHandle → 视图渲染 → Interceptor.afterCompletion → Filter 后置。
 -   **依赖注入**：拦截器支持直接注入 Spring Bean，过滤器需间接获取。
@@ -350,8 +351,13 @@ Spring 在 `TransactionDefinition` 中定义五种：
 
 ### 6.2 SpringBoot 的启动流程了解吗？
 **口述回答**：
-围绕 `@SpringBootApplication` 注解和 `SpringApplication.run()` 两个核心。注解是组合注解：`@SpringBootConfiguration`（标记配置类）+ `@EnableAutoConfiguration`（开启自动装配）+ `@ComponentScan`（扫描主类所在包及子包）。
-**run() 流程**：
+Spring Boot 的启动可以围绕两个核心来说：`@SpringBootApplication` 注解和 `SpringApplication.run()`。
+
+先说注解，它是一个组合注解，等于三个注解合体：`@SpringBootConfiguration` 标记这是一个配置类，`@EnableAutoConfiguration` 开启自动装配，`@ComponentScan` 扫描主类所在包及子包下的组件。
+
+run() 方法启动时大致经历这几个阶段：首先创建 SpringApplication 实例，确认应用类型是 Servlet Web 还是 WebFlux，准备好监听器；然后准备运行环境，把配置文件里的内容读进 Environment；接着创建 IoC 容器；容器创建好后加载主类作为配置源，告诉容器去哪里找配置；然后执行 refreshContext 刷新容器，这一步是核心——所有 Bean 的创建和自动装配都在这里触发；如果项目引入了 Web 依赖，接下来会启动内嵌的 Tomcat 开始监听端口；最后触发启动完成事件，执行我们自定义的 Runner，比如初始化数据、预热缓存。
+
+**run() 流程速记**：
 1.  创建 SpringApplication 实例，识别应用类型（Servlet Web 或 WebFlux），准备监听器。
 2.  准备运行环境 Environment。
 3.  创建 ApplicationContext。
@@ -359,6 +365,37 @@ Spring 在 `TransactionDefinition` 中定义五种：
 5.  refreshContext：刷新上下文，触发 Bean 实例化和自动装配。
 6.  若引入 Web 依赖，创建并启动内嵌 Tomcat，完成端口监听。
 7.  触发启动完成事件，调用 ApplicationRunner/CommandLineRunner。
+
+> [!info] 大白话解释
+> 1. 创建 SpringApplication —— 先"造个启动器"，确认是 Web 项目还是普通项目，并准备好在启动各阶段要通知的监听器。
+> 2. 准备 Environment —— 读取配置文件（application.yml 等）和系统参数存进 Environment，后面所有配置都从这里拿。
+> 3. 创建 ApplicationContext —— 创建 IoC 容器，容器准备开始"收 Bean"。
+> 4. prepareContext —— 告诉容器去主类里找配置（`@ComponentScan` 扫描范围、`@Bean` 等）。
+> 5. refreshContext —— **容器正式开工**：解析配置 → 创建所有 Bean → 自动装配生效，整个流程的核心。
+> 6. 启动内嵌 Tomcat —— Web 项目就把 Tomcat 拉起来监听 8080，等待 HTTP 请求。
+> 7. Runner 收尾 —— 广播启动完成事件，执行 ApplicationRunner/CommandLineRunner（初始化数据、预热缓存等启动后任务）。
+
+### 6.2.1 ApplicationRunner vs CommandLineRunner + 选项参数/非选项参数
+
+两个 Runner 都是 Spring Boot **应用启动完成后执行的回调**，用于启动后初始化（预热缓存、初始化数据、打印启动信息）。区别在接收参数的形态：
+
+- **CommandLineRunner**：`run(String... args)` 接收 **main 方法传来的原始 String[] 参数**，原样给你，需要自己手动解析。
+- **ApplicationRunner**：`run(ApplicationArguments args)` 接收 **Spring Boot 解析封装后的对象**，把参数分好类，还有便捷方法。
+
+**参数分类（Spring Boot 对命令行参数按 `--` 前缀分类）：**
+
+```bash
+java -jar app.jar --server.port=8080 --name=zhangsan hello world
+```
+
+| 类型 | 特征 | 例子 | 获取方式 |
+|------|------|------|---------|
+| **选项参数** | 带 `--` 前缀，形如 `--key=value` | `--server.port=8080`、`--name=zhangsan` | `args.getOptionValues("name")` → `["zhangsan"]` |
+| **非选项参数** | 不带 `--`，普通位置参数 | `hello`、`world` | `args.getNonOptionArgs()` → `["hello", "world"]` |
+
+**为什么区分：** `--key=value` 是"配置性质"的参数，Spring Boot 会自动注入 Environment（如 `--server.port=8080` 直接改端口，优先级很高）；非选项参数是"业务数据"，Spring Boot 不管，需要自己读。
+
+**执行顺序：** 多个 Runner 用 `@Order` 注解控制，值越小越先执行（也可实现 Ordered 接口）。
 **默认包扫描路径**是主类所在包及子包。
 
 ### 6.3 如何自定义一个 SpringBoot Starter？
@@ -371,6 +408,7 @@ Spring 在 `TransactionDefinition` 中定义五种：
 5.  在 `src/main/resources/META-INF` 下创建注册文件：2.7 前是 `spring.factories`，2.7+ 用 `AutoConfiguration.imports` 文件每行一个类名。
 6.  `mvn install` 打包。
 7.  其他项目引入依赖，在 application.yml 配置属性即可注入使用。
+完整代码例子见 [[自定义SpringBootStarter详解]]。
 
 ### 6.4 Spring Boot 和 Spring、SpringMVC 的区别？
 **口述回答**：
@@ -412,7 +450,15 @@ Spring Cloud Alibaba 早期用 Ribbon，新版本（2020.x+）切换为 Spring C
 **口述回答**：
 核心是 **CAP 取舍不同**。
 -   **Zookeeper 保证 CP**（一致性 + 分区容错）：当 master 节点网络故障与其他节点失联，剩余节点重新选举 leader，选举期间整个集群不可用（30~120 秒），在云部署环境下因网络问题丢失 master 概率较高，漫长的选举不可容忍。
--   **Eureka 保证 AP**（可用性 + 分区容错）：各节点平等，节点间复制注册信息，某节点故障不影响其他节点提供服务，即使返回几分钟前的注册信息也能接受，因为服务注册对可用性要求高于一致性。Eureka 还有自我保护机制：短时间内丢失过多心跳时不剔除服务，避免网络抖动误删。微服务场景更适合 AP。
+-   **Eureka 保证 AP**（可用性 + 分区容错）：各节点平等，节点间复制注册信息，某节点故障不影响其他节点提供服务，即使返回几分钟前的注册信息也能接受，因为服务注册对可用性要求高于一致性。Eureka 还有自我保护机制：短时间内丢失过多心跳时不剔除服务，避免网络抖动误删。微服务场景更适合 AP。CAP 详解见 [[CAP定理详解]]。
+
+>**Eureka 是 Netflix 开源的注册中心组件**，Spring Cloud 早期版本（Edgware/Greenwich 时代）的默认服务注册发现方案，后来 Spring Cloud 2020.x 把它从默认全家桶里移除了，国内项目大多换成了 Nacos。
 
 ---
 *文档生成时间：2026-08-07 | 资料来源：小林 coding、二哥的 Java 进阶之路、JavaGuide*
+
+## 背诵记录
+
+| 开始时间 | 结束时间 | 内容 | 状态 |
+|------|------|------|------|
+| 2026-08-07 16:26 | 2026-08-10 14:46 | 笔记梳理 Spring 七大核心模块面试高频考点，重点讲解 IoC 原理、Bean 生命周期、AOP 代理、事务管理、MVC 流程、Boot 自动装配及 Cloud 微服务治理的原理与实战坑点。 | 第一轮背记完成 |

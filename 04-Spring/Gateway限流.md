@@ -109,3 +109,10 @@ public class IpKeyResolver implements KeyResolver {
                 redis-rate-limiter.burstCapacity: 2
 ```
 
+---
+
+## 关联知识点
+
+- [[Sentinel详解]] — 网关限流的另一条路线（Gateway Adapter + 滑动窗口 + 规则实时推送），和本页的 Redis RequestRateLimiter（令牌桶）二选一
+- [[04-Spring/Spring Boot 与 Spring Cloud Alibaba 的关系]] — SCA 组件全景
+

@@ -29,6 +29,45 @@ public @interface SpringBootConfiguration { ... }
 - 内部使用 `@Configuration`，底层由 `ConfigurationClassPostProcessor`（`BeanFactoryPostProcessor`）处理
 - 被标注的类会通过 **CGLIB 动态代理**增强，保证 `@Bean` 方法的单例语义
 
+> [!tip] 为什么需要代理？——用"找助理"打个比方
+>
+> 你容易想不通的是："三级缓存不已经保证单例了吗？代理不是多此一举？"
+>
+> 咱打个比方。**三级缓存 = 你的助理，只有一个办公电脑，谁要电脑都找助理拿。**
+>
+> 现在 A 部门要电脑，B 部门也要电脑。正常流程：
+>
+> ```
+> 找助理 → 助理给一台 → 下次再有人要，助理说"就这一台，拿走"
+> ```
+>
+> 单例稳稳的，对吧？
+>
+> 但问题是——A 部门的工位长这样：
+>
+> ```java
+> @Bean
+> public A a() {
+>     return new A(b());  // A 内部自己又整了一台电脑
+> }
+> ```
+>
+> 看到了吗？A 自己写了 `new A(b())`，**它根本没找助理**。它自己悄悄地又弄了一台电脑出来。助理完全不知道这回事。
+>
+> 所以结果就是：助理手里有一台（三级缓存里的）、A 自己又造了一台——**两台电脑，单例破了**。
+>
+> **CGLIB 代理干的事，就是给 A 的工位装个摄像头，拦截它"自己造电脑"的企图：**
+>
+> ```
+> A 想自己造电脑
+>   └── 被代理拦截 → "等等，你先别自己造，我帮你问问助理"
+>         └── 找助理要 → 助理给缓存的那台 → A 拿到，不再自己造
+> ```
+>
+> 所以一句话：**三级缓存是助理，代理是"把想绕开助理的人硬拽回助理面前"的保安。** 没有保安，有助理也没用——因为有人根本不走正门。
+>
+> 反过来，`@Configuration(proxyBeanMethods = false)` 就是**关掉这个保安**。好处是启动快一点（不用装摄像头），代价是 A 自己造电脑的话，没人管得了。
+
 ------
 
 ### 2. @EnableAutoConfiguration（核心中的核心）
@@ -53,6 +92,24 @@ public @interface EnableAutoConfiguration { ... }
                                     └── 经过 @Conditional 条件过滤
                                           └── 最终生效的配置类注册到容器
 ```
+
+**执行步骤详解：**
+
+**① `@Import(AutoConfigurationImportSelector.class)`** — `@Import` 是 Spring 框架层面的注解，作用是把指定类注册为容器内的 BeanDefinition。这里的 `AutoConfigurationImportSelector` 实现了 `DeferredImportSelector` 接口——「延迟」的含义是它会在所有普通配置类（用户自己的 `@Configuration`、`@ComponentScan`）处理**完毕之后**才执行，从而保证**用户自定义 Bean 优先**，自动配置不会覆盖用户的显式定义。
+
+**② `selectImports()` → `getCandidateConfigurations()`** — `DeferredImportSelector` 的 `selectImports()` 是入口方法，内部委托 `getCandidateConfigurations()` 加载候选配置类的全限定名列表，返回 `String[]`，每个元素对应一个自动配置类的全类名。
+
+**③ 读取 `AutoConfiguration.imports` 文件** — Spring Boot 2.7+ 的新路径，取代了旧的 `spring.factories`。原因：`spring.factories` 是 Spring 通用 SPI 机制，所有自动配置类堆在一个文件里，可读性差、多模块合并易冲突；新路径按模块拆分，单一职责、更易维护。文件内容是一行一个全类名。
+
+**④ 加载所有候选配置类（~150+ 个）** — 注意此时只是加载全类名字符串，**并未实例化**。
+
+**⑤ `@Conditional` 条件过滤** — 每个自动配置类上标注了 `@Conditional` 系列注解，由 `ConditionEvaluator` 逐条判断。过滤是**条件组合**：一个配置类可能同时标注多个 `@Conditional`，必须全部满足才生效。
+
+**⑥ 最终生效的配置类注册到容器** — 通过过滤的配置类，其 `@Bean` 方法被调用，BeanDefinition 注册进容器，自动装配完成。
+
+**面试口述版：**
+
+> `@EnableAutoConfiguration` 的核心机制是 `@Import(AutoConfigurationImportSelector.class)`。这个 ImportSelector 实现了 `DeferredImportSelector`——延迟执行，等用户自定义的 `@Configuration` 和 `@ComponentScan` 处理完之后才跑，保证用户 Bean 优先。执行时 `selectImports()` 读取 `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports` 文件，拿到所有候选自动配置类的全类名，再逐个检查 `@Conditional` 条件——`@ConditionalOnClass` 看 classpath 有没有对应依赖类，`@ConditionalOnMissingBean` 看容器里有没有用户自定义的同类型 Bean——只有全部条件满足的配置类才注册进容器。
 
 **关键：@Conditional 条件注解体系**
 
@@ -119,6 +176,27 @@ main() → SpringApplication.run()
     │
     └── 4. 发布 ApplicationStartedEvent，运行 Runner
 ```
+
+**执行步骤详解：**
+
+**① 创建 ApplicationContext** — `SpringApplication.run()` 启动时先判断应用类型（Servlet / Reactive / 非 Web），据此创建对应的上下文实现。因为引入了 web starter，这里创建的是 `AnnotationConfigServletWebServerApplicationContext`——一个"基于注解配置 + 内嵌 Servlet Web 服务器"的上下文。
+
+**② `prepareContext()`** — 上下文预准备阶段。核心动作是把**主启动类本身**注册为 BeanDefinition。主启动类是一个 `@SpringBootConfiguration` 配置类，必须先注册进去，后续 `ConfigurationClassPostProcessor` 才能解析它。同时这里还会把 `springApplicationArguments`、`springBootBanner` 等作为 Bean 注册，并加载 `initializers`、`listeners`。
+
+**③ `refreshContext()` → `AbstractApplicationContext.refresh()`** — 整个启动的核心，调用的是 Spring 框架标准的容器刷新方法（模板方法模式，`ApplicationContext` 统一入口）。刷新失败会自动销毁已创建的 Bean 并关闭上下文。三个关键子步骤：
+
+- **`invokeBeanFactoryPostProcessors()`**：回调所有 `BeanFactoryPostProcessor`。其中 `ConfigurationClassPostProcessor` 是真正干活的——它解析主配置类，依次触发 `@SpringBootConfiguration`（识别配置类）、`@ComponentScan`（扫描并注册业务 Bean）、`@EnableAutoConfiguration`（加载并过滤自动配置类）。
+- **`registerBeanPostProcessors()`**：注册所有 `BeanPostProcessor`——这是 Bean 实例化之后的生命周期钩子，`@Autowired` 注入、`@Value` 解析、AOP 代理等都是在这里注册的处理器在后续生效。
+- **`onRefresh()`**：模板方法，留给子类扩展。`ServletWebServerApplicationContext` 在这里创建并启动**内嵌 Tomcat**，同时初始化 `DispatcherServlet` 等 Web 组件。
+
+> [!note] refresh() 里省略的步骤
+> 完整 refresh() 还有 `finishBeanFactoryInitialization()`（实例化所有非懒加载单例 Bean）、`finishRefresh()`（发布 `ContextRefreshedEvent`）等。`invokeBeanFactoryPostProcessors` 在前、单例实例化在后，是"先有定义、再实例化"的分层设计。
+
+**④ 发布 `ApplicationStartedEvent`，运行 Runner** — `refresh()` 完成后，`SpringApplication` 继续收尾：广播 `ApplicationStartedEvent`，然后运行容器里的 `ApplicationRunner` / `CommandLineRunner`（常用于启动后执行一次性任务，如预热缓存）。
+
+**面试口述版：**
+
+> 启动流程的核心是 `SpringApplication.run()` 里的 `refresh()`。run 会先根据应用类型创建对应的 ApplicationContext——比如 Web 项目就是 `AnnotationConfigServletWebServerApplicationContext`。然后 `prepareContext` 把主启动类注册成配置类 BeanDefinition。接着调用 Spring 标准的 `refresh()` 刷新容器，这是整个启动的关键：里面 `invokeBeanFactoryPostProcessors` 阶段，`ConfigurationClassPostProcessor` 会解析主配置类，触发 `@ComponentScan` 扫描业务 Bean，触发 `@EnableAutoConfiguration` 加载自动配置；`registerBeanPostProcessors` 注册 BeanPostProcessor，为后面的依赖注入和 AOP 做准备；`onRefresh` 是模板方法，内嵌 Tomcat 就是在这里启动的。refresh 完成后再发布 `ApplicationStartedEvent`，运行 Runner 收尾。
 
 ------
 

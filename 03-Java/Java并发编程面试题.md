@@ -1945,6 +1945,8 @@ public class FairReentrantLock {
 
 ### Threadlocal作用，原理，具体里面存的key value是啥，会有什么问题，如何解决?
 
+> [!info] 关联深度笔记：[[ThreadLocal 深度解析与内存泄露笔记]] — 内含引用链图示、弱 Key 设计辩证、Value 为何不能弱引用、线程池脏数据、四步面试答题套路
+
 `ThreadLocal` 是Java中用于解决线程安全问题的一种机制，它允许创建线程局部变量，即每个线程都有自己独立的变量副本，从而避免了线程间的资源共享和同步问题。
 
 ![img](https://cdn.xiaolincoding.com//picgo/1719982991053-c983c4b8-7c5f-4e2d-a90d-5b42ebd533d5.png)
@@ -1962,7 +1964,7 @@ public class FairReentrantLock {
 
 > ThreadLocal的原理
 
-`ThreadLocal` 的实现依赖于 `Thread` 类中的一个 `ThreadLocalMap` 字段，这是一个存储 `ThreadLocal` 变量本身和对应值的映射。每个线程都有自己的 `ThreadLocalMap` 实例，用于存储该线程所持有的所有 `ThreadLocal` 变量的值。
+`ThreadLocal` 的实现依赖于 `Thread` 类中的 `ThreadLocal.ThreadLocalMap` 字段，它是一张以 `ThreadLocal` 对象为 key（弱引用）、线程私有数据为 value 的映射表。每个线程在首次 `get()`/`set()` 时按需创建自己的 `ThreadLocalMap` 实例，保存的是该线程为各个 `ThreadLocal` 设置的 value——ThreadLocal 对象本身是跨线程共享的 key，不属于任何单个线程。
 
 当你创建一个 `ThreadLocal` 变量时，它实际上就是一个 `ThreadLocal` 对象的实例。每个 `ThreadLocal` 对象都可以存储任意类型的值，这个值对每个线程来说是独立的。
 

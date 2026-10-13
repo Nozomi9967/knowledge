@@ -5,7 +5,7 @@ author:
   - "[[小林coding]]"
 published: undefined
 created: 2026-06-04
-updated: 2026-06-18
+updated: 2026-10-08
 description: "全面的Java基础面试题汇总，涵盖Java核心概念、面向对象编程、JVM原理、集合框架、多线程并发、异常处理、IO流、反射、注解、泛型、Lambda表达式、Stream API以及Java新特性等核心知识点。适合Java开发者面试准备和技术复习。"
 tags:
   - java
@@ -194,6 +194,9 @@ public static void changeReference(Person obj) {
 - 引用类型传递 “引用的副本”，通过副本可修改对象内容，但无法改变原引用的指向。
 
 ## 数据类型
+
+> [!note] 变量名 / 标识符规则（笔试爱考）
+> Java 标识符（变量名等）**首字符不能是数字**，可以是**字母、下划线 `_`、美元符号 `$`**，以及符合 Java 标识符规则的 Unicode 字符；后续字符才能含数字。惯例上变量名以小写字母开头（`count`、`studentName`）。
 
 ### 八种基本的数据类型
 
@@ -550,6 +553,16 @@ Java面向对象的三大特性包括： **封装、继承、多态** ：
 	- 在Java中，可以使用父类类型的引用指向子类对象，这是向上转型。通过这种方式，可以在运行时期采用不同的子类实现。
 		- 向下转型是将父类引用转回其子类类型，但在执行前需要确认引用实际指向的对象类型以避免 `ClassCastException` 。
 
+> [!info] 运行时多态的三个前提（缺一不可）
+> 1. **有继承关系**（子类 `extends` 父类，或类 `implements` 接口）；
+> 2. **子类重写了父类 / 接口的方法**；
+> 3. **父类 / 接口类型的引用指向子类对象**（向上转型）。
+>
+> 三者齐备，调用时才发生"**编译时看声明类型、运行时看实际类型**"：编译器只放行声明类型（父类 / 接口）里声明了的方法；JVM 执行时按对象的**实际类型**去查虚方法表，调到子类重写的版本。
+
+> [!warning] 运行时多态的边界
+> 运行时多态**只针对"被重写的实例方法"**。`static` 方法（静态绑定，按声明类型调）、**字段访问**（按声明类型解析）、`private` 方法、构造器**都不参与**运行时多态。所以 `Animal a = new Dog()` 里 `a.speak()` 走 Dog 的重写版，但如果 `Animal` / `Dog` 有同名字段 `name`，`a.name` 取的是 `Animal` 的。
+
 ### 多态解决了什么问题？
 
 多态解决的核心问题是：**调用方无需根据对象的具体类型写 if-else 来判断该执行什么行为**。
@@ -658,6 +671,18 @@ public void makeSound(Animal animal) {
 - 成员修饰符：接口成员变量默认为 `public static final`，必须赋初值且不可修改；抽象类成员变量默认为 default 权限，可在子类中重新定义或赋值。
 - 方法修饰符：接口中的抽象方法默认为 `public abstract`；Java 9 起可定义 `private` 方法辅助 default 方法实现。抽象类中的抽象方法被 `abstract` 修饰，不能用 `private`/`static`/`synchronized`/`native`，以分号结尾、不带花括号。
 - 变量类型：抽象类可包含实例变量和静态变量，接口只能包含静态常量。
+
+> [!note] 接口可以"多继承"
+> 类只能单继承，但**接口可以用 `extends` 一次继承多个接口**：`interface C extends A, B {}`——实现 `C` 的类要实现 `A`、`B` 的全部抽象方法。JDK 8 起接口能有 default 方法，若两个父接口有**同名 default 方法**，子接口 / 实现类**必须重写**来消除冲突（可用 `A.super.hi()` 明确选一个）。这也正是一道选择题里"B 选项正确"的原因之一：**一个类只能继承一个类，但可实现多个接口；一个接口可继承多个接口**。
+
+> [!note] `abstract` 的作用范围
+> **只能修饰类和方法**，不能修饰变量、字段、局部变量或构造器。`abstract class Shape`、`abstract void draw();` 合法；`abstract int count;` 不合法（编译错误）。
+
+> [!tip] 一句话分辨：抽象类是 is-a，接口是 can-do
+> - **抽象类**表达 **"是不是一种（is-a）"**：`Dog is-a Animal`，天然带**共享状态和共享实现**（字段、构造器、已实现方法）——它是"**带共享状态的模板**"，适合"一族相关类复用同一套骨架"。
+> - **接口**表达 **"能不能做（can-do）"**：`Bird can Fly`、`User can Serializable`——它只声明**能力契约**，不携带实例状态，一个类可以 can-do 很多件事（多实现）。
+>
+> 选型口诀：**需要复用状态 / 实现 → 抽象类；需要声明能力 / 让无关类共享契约 → 接口**。想要"多继承的效果"时，用接口（多实现）+ 抽象类（单继承模板）组合。
 
 ### 抽象类能加final修饰吗？
 
@@ -909,6 +934,11 @@ public class Main {
 
 ## 关键字
 
+> [!note] 方法声明修饰符顺序（笔试题）
+> Java 方法声明的顺序是：`访问修饰符 static final <泛型参数> 返回类型 方法名(...)`。例：`public static final <T> T identity(T value)`。
+> - **泛型 `<T>` 写在返回类型前**；`static`、`final` 写在返回类型前，**二者顺序可互换**（`public final static` 也合法）。
+> - `final` 表示方法不能被重写；`static` 表示方法属于类（用类名即可调用）。
+
 ### Java 中 final 作用是什么？
 
 `final` 关键字主要有以下三个方面的作用：用于修饰类、方法和变量。
@@ -982,6 +1012,22 @@ public class Database {
     }
 }
 ```
+
+> **补充：非静态代码块（构造块 / 实例初始化块）**
+>
+> 它是写在类里、方法外的一对 `{}`，没有 `static`、没有名字。**每创建一个对象就执行一次，且先于构造方法的方法体**（编译器会把它复制到每个构造方法开头、`super(...)` 之后）。平时少见，是因为大多数初始化直接写在构造方法里。
+>
+> 有继承关系时的**执行顺序**（面试常考，`new` 子类时）：**父类静态块 → 子类静态块**（类初始化，只一次）→ **父类构造块 → 父类构造方法** → **子类构造块 → 子类构造方法**。
+>
+> 用途：多个构造方法有共同初始化逻辑时放进构造块避免重复；匿名内部类没有构造方法，也常用它初始化（"双括号初始化"`new ArrayList<>(){{ add("a"); }}`，但会多生成一个匿名类，一般不推荐）。
+>
+> ```java
+> class Demo {
+>     { System.out.println("构造块"); }        // 每次 new 都执行
+>     Demo() { System.out.println("构造方法"); }
+> }
+> // new Demo() 输出：构造块 → 构造方法
+> ```
 
 > 4、修饰内部类
 
@@ -2048,6 +2094,38 @@ Predicate<Integer> isEven = n -> n % 2 == 0;
 
 > 面试话术：函数式接口的价值在于——它给 Lambda 表达式提供了一个"类型目标"。没有函数式接口，Lambda 就不知道自己要实现什么。
 
+**补充：Lambda 是"对象"吗？** 是的。Lambda 求值得到的是**函数式接口的一个实例**，因此它也是 `Object`——可以赋给 `Object` 变量、放进集合、当参数传递：
+
+```java
+Runnable task = () -> System.out.println("运行");
+Object o = task;         // ✅ Lambda 是对象
+new Thread(task).start();
+```
+
+但**不要依赖**它对应某种具体实现类，也**不要依赖**它是否复用同一个对象——具体机制由 JVM 决定，日常把它当"函数式接口的实例"理解就够。（同一处**不捕获**外部变量的 Lambda，JVM 会常量化为同一实例、`==` 为 `true`；**捕获了**变量的则每次新建、`==` 为 `false`，详见 [[Java基础热门面试题#37. Lambda 表达式的原理？和匿名内部类有什么区别？【中频】]]。）
+
+**补充：匿名内部类实现函数式接口（Lambda 的传统写法）**
+
+```java
+@FunctionalInterface
+interface Greeting {
+    void sayHello(String name);
+}
+
+// 匿名内部类
+Greeting g1 = new Greeting() {
+    @Override
+    public void sayHello(String name) {
+        System.out.println("你好，" + name);
+    }
+};
+
+// 等价的 Lambda
+Greeting g2 = name -> System.out.println("你好，" + name);
+```
+
+匿名内部类写法要显式写出接口名和方法签名；Lambda 只保留"参数 + 方法体"。见 [[Java内部类#2.4 匿名内部类]]。
+
 ### Lambda 表达式了解吗？
 
 Lambda 表达式它是一种简洁的语法，用于创建匿名函数，主要用于简化函数式接口（只有一个抽象方法的接口）的使用。其基本语法有以下两种形式：
@@ -2196,6 +2274,13 @@ stream.map(s -> { String trimmed = s.trim(); return Integer.parseInt(trimmed); }
 ```
 
 > 面试话术：方法引用不是"新功能"，而是"语法糖的语法糖"——它让原本已经简洁的 Lambda 更紧凑，可读性更强。面试中通常理解概念和几种基本形式就够了。
+
+**补充：方法引用 vs Lambda 的字节码差异**
+
+- **Lambda**：Lambda 体被编译成当前类里一个**私有合成方法**（名字形如 `lambda$main$0`），调用点用 `invokedynamic` 去链接它——所以 Lambda 通常**多一个合成方法**。
+- **方法引用**：若 Lambda 体只是"把参数原样转交给一个已有方法"，写成方法引用后**不再生成那个合成方法**，`invokedynamic` 的 bootstrap 直接解析到**目标方法本身**（`Integer::parseInt` 直达 `Integer.parseInt`）——少一层转发，语义上更"零成本"。
+- **所以**：`Integer::parseInt` 和 `s -> Integer.parseInt(s)` **行为相同、结果相同**，但**字节码不同**。面试里说方法引用"**可能**略优"即可，**不要**说成"性能一定更好"——两者最终都靠 `invokedynamic` + `LambdaMetafactory` 生成实现，差别通常可忽略。
+- **checked 异常**：`Function.apply` 等**不声明** `throws`，所以无论方法引用还是 Lambda，只要内部调用的方法抛 **checked 异常**而又没在 Lambda 体内捕获，都会**编译失败**——两者限制一样。（`parseInt` 抛的是运行时异常 `NumberFormatException`，不涉及此限。）
 
 ### Java中stream的API介绍一下
 

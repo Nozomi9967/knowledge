@@ -5,7 +5,7 @@ tags:
   - 并发
   - 面试
 created: 2026-06-28
-updated: 2026-06-28
+updated: 2026-10-08
 ---
 
 # ConcurrentModificationException 详解：for-each 遍历时 remove 的问题
@@ -231,6 +231,32 @@ public boolean removeIf(Predicate<? super E> filter) {
 > **面试官追问："怎么修复？"**
 >
 > 答：有三种方案。一、用 `Iterator.remove()`，它会在调用 List.remove 后同步 `expectedModCount`，适合单线程遍历中删当前元素。二、用 `CopyOnWriteArrayList`，它的迭代器是快照模式的，没有 modCount 检查，但每次增删都复制底层数组，只适合读多写极少的并发场景。三、用 `removeIf`，这是 JDK 8 的批量删除方法，内部用 BitSet 标记 + 一次批量移位，性能最优且一行搞定。**单线程场景下 `removeIf` 是最佳选择。**
+
+---
+
+## fail-fast 的精确边界
+
+很多人把 `ConcurrentModificationException` 当成"Java 帮你检测并发问题"的可靠机制，这是误解。精确表述如下：
+
+**1. fail-fast 是"尽力尽早抛"，不是保证必抛。**
+它只是"结构性修改计数（`modCount`）≠ 迭代器快照（`expectedModCount`）时，若在下一次 `next()/hasNext()` 的检查中被发现，就抛异常"。它**不保证**一定检测到，只是"一旦发现就尽早失败"。所以**没抛 ≠ 没有并发修改**，不能拿"没报错"当"安全"。
+
+**2. 它不是并发安全检测工具，单线程照样触发。**
+前文 `for-each` 里直接 `list.remove` 就是**单线程**触发的经典例子。fail-fast 跟"几个线程"没有必然关系，它检测的是"**迭代器使用期间集合被结构性改动**"。
+
+**3. "结构性修改"依实现而定。**
+`modCount` 只在结构性修改时才 ++：
+- `add` / `remove` / `clear` → 算结构性修改，会触发；
+- `ArrayList.set(i, e)`（替换已有位置、**不改变 size**）→ **不算**结构性修改，`modCount` 不变，**不会**触发 fail-fast。
+
+**4. 多线程场景不能一概"换 CopyOnWriteArrayList"。**
+`CopyOnWriteArrayList` 靠"写时复制 + 快照迭代器"**回避**了 CME，但它不是万能解药：
+- 它是**读多写极少**的容器——每次写都复制整个底层数组，写频繁时 CPU / GC 代价巨大；
+- 迭代器读到的是**创建时的快照**，写操作对已持有的迭代器**不可见**（弱一致），有读到旧数据的风险。
+
+  真正的多线程高并发读写，应优先考虑 `ConcurrentHashMap`、加锁，或 `Collections.synchronizedList` + 显式同步迭代，而不是无脑 COW。
+
+> 一句话：**fail-fast 是"迭代器使用期间集合被改动就赶紧报错"的尽力而为机制，不是并发检测；单线程也会触发，结构性修改的定义依实现，多线程也不等于必须换 COW。**
 
 ---
 

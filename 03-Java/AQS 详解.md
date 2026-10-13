@@ -244,7 +244,7 @@ tryAcquire(arg) ──成功──→ 拿到锁，继续执行
 
 ## 4. 线程唤醒与锁二次竞争 (`Unpark` / `Re-Acquire`)
 当持有锁的线程释放同步状态时，会触发 AQS 的唤醒与重新竞争机制：
-* **释放与唤醒（`unparkSuccessor`）：** 锁释放线程会检查 `head` 的状态，若为 `SIGNAL`，则调用 `LockSupport.unpark(s.thread)` 显式唤醒 `head` 的后继节点。
+* **释放与唤醒（`unparkSuccessor`）：** 持锁线程（其节点即 head）调用 `release()` 时，检查 `head.waitStatus`，若为 `SIGNAL`，则传 head 给 `unparkSuccessor(head)`，找到 head 的后继节点并调用 `LockSupport.unpark(s.thread)` 显式唤醒。
 * **上下文恢复与惊群竞争：** * 被唤醒的线程从 `LockSupport.park` 处**原位复活**，继续执行 `for(;;)` 死循环。
   * **在非公平锁模式下：** 刚醒来的线程在执行 `tryAcquire` 的瞬间，可能会遭遇外面新来线程（未入队）的“插队”竞争。如果锁被新来的线程劫走，唤醒的线程会遭遇抢锁失败。
 * **二次阻塞：** 若抢锁失败，该线程保持队列位置不变，重新执行第 3 步的逻辑——确认前驱 `SIGNAL` 状态后，再次调用 `park` 进入休眠，等待下一次被唤醒。
@@ -395,8 +395,13 @@ tryReleaseShared(arg) ──成功──→ doReleaseShared
 AQS 的 `Node` 类里有个 `nextWaiter` 字段，**被复用为"模式标记"**：
 
 ```java
-static final Node EXCLUSIVE = null;        // 独占模式（nextWaiter=null 即独占）
-static final Node SHARED = new Node();     // 共享模式（nextWaiter=SHARED 即共享）
+static final class Node {
+    static final Node SHARED = new Node();    // 共享模式标记
+    static final Node EXCLUSIVE = null;       // 独占模式标记（即 null）
+
+    volatile Thread thread;                   // 入队线程
+    Node nextWaiter;                          // ★ nextWaiter 字段：null=独占，SHARED=共享
+}
 ```
 
 **两种 Node 可以在同一个 CLH 队列里共存**（读写锁就是这样——读锁是 SHARED 节点、写锁是 EXCLUSIVE 节点混排）。但**唤醒规则要分模式**：
@@ -489,7 +494,7 @@ public final void acquire(int arg) {
 | **状态信号量** | `shouldParkAfterFailedAcquire` | park 之前**前驱 waitStatus 是不是 SIGNAL**？否则要 CAS 改 | [[#4.4 shouldParkAfterFailedAcquire：状态机\|4.4]] |
 | **真挂起** | `parkAndCheckInterrupt` | `LockSupport.park` 让线程进入 **WAITING** 状态 | [[#4.5 parkAndCheckInterrupt：真挂起\|4.5]] |
 
-> **整体设计哲学：先 CAS 抢一把，失败再排队，排队时前驱是 head 还能再抢一次（局部自旋省 park 唤醒的开销），实在没机会才 park 挂起。被 unpark 唤醒后**从头循环**——这就是 AQS 兼顾吞吐和公平性的秘密。**
+> **整体设计哲学：先 CAS 抢一把（快速路径），失败走完整 acquire。`tryAcquire` 再抢一次（含可重入判断），还失败才入队。入队后进入 `acquireQueued` 的 `for(;;)` 循环——前驱是 head 就有资格抢，每次被唤醒都会再抢；如果前驱的 waitStatus 还不是 SIGNAL（刚入队时是 0），`shouldParkAfterFailedAcquire` 会把状态改成 SIGNAL 并让循环再转一次，这个**局部自旋**省掉了不必要的 park/unpark 开销。实在没机会才 park 挂起。被 unpark 唤醒后又回到循环顶部——这就是 AQS 兼顾吞吐和公平性的秘密。**
 
 ### 4.2 `addWaiter`：入队（队尾 CAS）
 

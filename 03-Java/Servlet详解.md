@@ -6,7 +6,7 @@ tags:
   - 面试
   - 生命周期
 created: 2026-07-02
-updated: 2026-07-02
+updated: 2026-10-09
 source: raw/clippings/ （待补充原始资料）
 ---
 	
@@ -401,6 +401,16 @@ public class LogFilter implements Filter {
 
 ---
 
+> [!info]- 补充：Filter 的优先级怎么设置（Spring Boot）
+> **值越小、优先级越高、越先执行。** 三种方式：
+> 1. **`@Order(1)` 或实现 `Ordered` 接口**——Filter 作为 Bean 被自动注册时生效。
+> 2. **`FilterRegistrationBean.setOrder(1)`**（更推荐，还能同时配 URL 匹配规则）。
+> 3. `@WebFilter` + `@ServletComponentScan`——这种方式下 `@Order` **通常不生效**，需要排序时建议改用 `FilterRegistrationBean`。
+>
+> 请求进来时按 order 从小到大依次经过各 Filter，响应返回时顺序相反（洋葱模型）。默认值是 `Ordered.LOWEST_PRECEDENCE`（`Integer.MAX_VALUE`）。⚠️ Filter 属 **Servlet 层**，在 Spring MVC 的 Interceptor **之前**执行，两者顺序不由同一套 order 控制。
+
+---
+
 ### Q7:Servlet 的线程模型是怎样的？线程安全吗？
 
 Servlet 默认是**单例多线程**模型：
@@ -646,6 +656,52 @@ Integer count = (Integer) ctx.getAttribute("userCount");
 
 ---
 
+### Q13:Servlet 和 CGI 有什么区别？Servlet 为什么取代了 CGI？
+
+**CGI（Common Gateway Interface，通用网关接口）** 是 20 世纪 90 年代早期 Web 时期制定的标准协议。当时的网页大多是静态 HTML，服务器只能把文件原样吐给浏览器；为了实现表单提交、留言板、搜索等**动态内容**，人们让 Web 服务器把请求"外包"给一个**独立的外部程序**处理，再把程序输出转发回浏览器——这就是 CGI。
+
+**CGI 的请求流程：**
+
+```
+浏览器提交请求
+     ↓
+Web 服务器收到 → 为这个请求 fork 一个新进程（运行 CGI 程序）
+     ↓
+请求信息通过「环境变量 + 标准输入」传给程序
+     ↓
+程序把生成的内容（通常是 HTML）通过「标准输出」返回给服务器
+     ↓
+服务器转发给浏览器 → 进程随即退出、销毁
+```
+
+> **一句话本质：CGI 是「每个请求一个进程」，Servlet 是「常驻 JVM 里用线程处理请求」。** 所有差异都从这一条推导。
+
+**核心对比：**
+
+| 维度 | CGI | Servlet |
+|------|-----|---------|
+| **运行单元** | 每个请求 fork 一个**新进程**，处理完即销毁 | 常驻**服务器进程（JVM）**中，用**线程**跑 `service()` |
+| **性能/开销** | 进程创建 + 解释器启动 + 销毁，开销大，高并发下资源紧张 | 线程复用（线程池），无进程创建开销，高并发表现好 |
+| **状态/资源复用** | 请求间无法共享内存，连接、缓存都要重建 | 单例 Servlet，实例常驻，可复用连接池、缓存 |
+| **易用性（API）** | 语言无关但**无统一接口**，参数解析、响应头、Cookie、会话都要自己写 | 容器提供 `HttpServletRequest`/`HttpServletResponse`/`HttpSession`，自动解析并解码表单、读写 HTTP 头、处理 Cookie、跟踪会话 |
+| **可移植性** | ⚠️ **不如 Servlet**：程序常依赖具体操作系统和服务器环境，换环境往往要修改、重新编译 | "一次编写，到处运行"，只要服务器实现 Servlet 规范即可 |
+| **语言** | 不限（Perl、C、Python、Shell…） | Java |
+
+**逐条对应那道选择题：**
+
+- ✅ **A 正确**：Servlet 处于服务器进程中，通过多线程方式运行 `service()`——每个请求由一个线程处理，比 CGI 高效。
+- ✅ **B 正确**：CGI 对每个请求都产生新进程，服务完成后销毁，资源消耗大。
+- ✅ **C 正确**：Servlet 提供大量实用工具例程——自动解析和解码 HTML 表单数据、读取和设置 HTTP 头、处理 Cookie、跟踪会话状态。
+- ❌ **D 错误（即答案）**：说"CGI 可移植性高于 Servlet"是反的。**Servlet 基于 Java 的"一次编写，到处运行"，可移植性优于 CGI**；CGI 程序往往要针对不同操作系统和服务器环境修改、重编译。
+
+**为什么 CGI 会慢？** 每次请求都要付出「创建进程 → 启动解释器 → 加载程序 → 销毁进程」的代价，而且请求之间**无法复用**任何内存状态。并发一高，进程数量爆炸，系统很快被拖垮。
+
+**后来的演进：** CGI → **FastCGI / WSGI**（让程序**常驻**、反复处理请求，避免反复创建进程，如 PHP-FPM、uWSGI）→ **Servlet**（干脆常驻在 JVM 里，用线程池处理请求）。思路是一致的：**把"进程"换成"常驻 + 复用"**。
+
+> **面试话术：** "CGI 是最早的动态网页方案，核心是**每个请求起一个新进程**、处理完就销毁，简单但开销大；Servlet 把处理逻辑**常驻在服务器进程（JVM）里**，用**多线程**处理请求，还通过容器封装了参数解析、HTTP 头、Cookie、会话管理这些工具例程。所以在**性能、易用性、可移植性**三个维度上 Servlet 都优于 CGI——尤其可移植性，Servlet 靠 Java 的『一次编写，到处运行』胜过需要按环境改写的 CGI。这三点正好就是那道题里 A、B、C 正确、D 错误的原因。"
+
+---
+
 ## 二、Servlet 与 Spring MVC 的关系
 
 ### DispatcherServlet 的本质
@@ -686,6 +742,7 @@ HttpServlet（Java Servlet API 基类）
 | Servlet 3.0 新特性？ | 注解配置、异步处理、文件上传 |
 | GET vs POST？ | 语义不同、参数位置不同、GET 幂等可缓存、POST 不幂等 |
 | Spring MVC 和 Servlet 关系？ | DispatcherServlet 继承 HttpServlet，Spring MVC 是对 Servlet 的封装 |
+| Servlet vs CGI？ | CGI 每请求一个进程、处理完销毁；Servlet 常驻 JVM 用多线程跑 service()。Servlet 在**性能 / 易用性 / 可移植性**上全面胜出 |
 
 ---
 

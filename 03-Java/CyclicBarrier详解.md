@@ -258,6 +258,13 @@ private int dowait(boolean timed, long nanos) throws InterruptedException, Broke
 }
 ```
 
+> [!note] 1 把锁 vs 线程并发：不矛盾
+> CyclicBarrier 内部**只有 1 把 ReentrantLock + 1 个 Condition（trip）**，很多人会困惑"那线程岂不是串行？"——不会。**锁只保护屏障内部状态的临界区（改 count、换 generation），只在线程调用 await() 的那一瞬间被短暂持有**，而且没到齐的线程在 `trip.await()` 时就已经**释放锁并挂起**了。
+>
+> 所以时间线是：各线程**并行**干活 → 到屏障**瞬间拿锁**改 count → 没到齐就**释放锁挂起**（或最后一个到齐 **signalAll 唤醒所有人**）→ 放行后各线程**再次并行**干活。锁保护的只是"签到簿的笔"，签完就放；业务逻辑全程无锁并行。**1 把锁 = 串行化保护临界区，≠ 线程串行执行。**
+>
+> 注意：被唤醒的线程**不对 count 做任何操作**——count 已经被最后一个到齐的线程减到 0 并重置了。它们抢回锁只是 Condition 的硬性语义要求（`await()` 返回前必须重新持有锁），以及保证读到 `generation` 新对象的可见性（`generation` 不是 volatile，靠同一把锁的 happens-before 保证）。抢到锁后只判断 `g != generation`（代际变了），然后直接 return 进入下一轮。
+
 ### 3.3 `nextGeneration`：循环的关键
 
 ```java

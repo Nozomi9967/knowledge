@@ -5,7 +5,7 @@ tags:
   - 性能优化
   - JVM
 created: 2026-06-28
-updated: 2026-06-28
+updated: 2026-10-07
 ---
 
 # 同事写了 `String s = "a" + i + "b" + j;` 在循环里拼接 10 万次出现 CPU 飙高，请解释 JDK 8 与 JDK 17 下编译器分别如何处理，以及你会怎么改写。
@@ -40,6 +40,25 @@ invokedynamic #7, 0  // BootstrapMethods: StringConcatFactory.makeConcatWithCons
 ```
 
 运行时 JVM **首次触发时 bootstrap 生成优化的拼接方法**，避免了显式 `new StringBuilder`。但关键点是：**在循环里每次仍然产生新 String 对象**，本质上对象分配压力依然存在，只是常数系数更小（去掉了 StringBuilder 本身的分配），并不是零成本的。
+
+#### 「首次触发时 bootstrap 生成」是什么意思
+
+`invokedynamic` 的特点是：**调谁不在编译期定死，而是第一次执行到这里时由 JVM 现场决定**。拆成三段看：
+
+- **bootstrap（引导方法）= 查号台**：普通方法调用（invokevirtual/invokestatic）编译期就写死了调谁、直接调用；`invokedynamic` 编译期只留一句"到时候问查号台"。字符串拼接场景下，这个查号台就是 `StringConcatFactory.makeConcatWithConstants`。
+- **首次触发**：这条 `invokedynamic` 指令**第一次被执行**的那一刻，JVM 才去调那个 bootstrap 方法，让它返回"真正该调的方法"。
+- **生成 + 缓存**：bootstrap 拿到模板（recipe）和参数类型后，用 MethodHandle **现场生成一个专用拼接方法**，**生成一次后缓存到调用点（CallSite）**，后续直接复用、不再走 bootstrap。
+
+一句话打比方：普通调用 = 通讯录里早存好号码、拨就通；`invokedynamic` = 第一次打电话前先问查号台"号码是多少"，查号台把号码给你、顺手存进通讯录，以后直接拨。
+
+#### 相比 JDK 8 自动生成的 StringBuilder，三个优势
+
+1. **分配更少**：4 个 → 2 个（省掉 StringBuilder 对象本身 + 一次 char[] 复制）
+2. **不扩容**：StringBuilder 默认容量 16、不够就 `Arrays.copyOf` 留下废弃数组；invokedynamic 先算精确长度、一次分配到位
+3. **解耦编译期**：「怎么拼最高效」交给运行时决定，以后优化不用改字节码、不用改语法
+
+> [!warning] 这三个优势只对「单次拼接」成立
+> 对手写、提到**循环外**的 StringBuilder，它**没有优势**——每次仍 new 一个 String、不跨循环累加。所以循环里拼字符串，该手写 StringBuilder 还得手写，invokedynamic 救不了。
 
 ---
 
@@ -171,6 +190,20 @@ return new String(buf, LATIN1); // 共享这个 byte[]，不再复制
 ```
 
 **共 4 个堆对象**，而且 ④ 是一次完整的数组内存复制（`System.arraycopy`）。
+
+**④ 的「从 buf 复制过来」是什么意思：** `StringBuilder` 内部有个工作数组 `char[] buf`（默认容量 16、有富余），拼接时字符先写进它：
+
+```
+StringBuilder → char[] buf: [a][1][2][3][b][_][_]   ← 有效字符 + 空位
+```
+
+调 `toString()` 时，String **不能直接共享这个 buf**——因为 String 是不可变的，若共享，之后再 `sb.append()` 会把已生成的 String 也改了、破坏不可变性。所以 String 把 buf 里**有效字符复制一份**存进自己的 char[]：
+
+```
+String → char[]: [a][1][2][3][b]   ← 复制品，String 独占
+```
+
+这就是第 4 个对象。**JDK 9+ 没这一步**：StringConcatFactory 直接 new 精确大小的 byte[]，`new String` 直接**采用**（trust，不复制）——数组是刚造的、不怕被别人改。
 
 ---
 

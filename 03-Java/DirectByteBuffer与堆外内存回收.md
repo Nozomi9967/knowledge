@@ -7,7 +7,7 @@ tags:
   - DirectByteBuffer
   - GC
 created: 2026-06-10
-updated: 2026-06-10
+updated: 2026-10-08
 ---
 
 # DirectByteBuffer 回收：为什么堆外内存不足会触发 Full GC？
@@ -158,6 +158,28 @@ DirectByteBuffer 分配失败时调用的 System.gc() 被忽略
 > **问：堆外内存不足为什么会触发 Full GC？Full GC 又不会回收堆外内存。**
 >
 > 答：这是 NIO 设计上的巧妙之处。`DirectByteBuffer` 分配堆外内存时，内部有一个 `Cleaner` 对象，当 `DirectByteBuffer` 本身被 GC 回收时，`Cleaner` 会释放对应的堆外内存。所以**回收堆外内存的前提是堆内的 `DirectByteBuffer` 对象先被 GC 回收**。当分配新的 `DirectByteBuffer` 发现堆外内存不足时，`Bits.reserveMemory()` 方法会主动调用 `System.gc()` 触发 Full GC，期望通过回收不可达的 `DirectByteBuffer` 对象来间接释放堆外内存。这也是为什么 `-XX:+DisableExplicitGC` 有副作用——它禁掉了这个"最后回收手段"，可能导致堆外 OOM。
+
+---
+
+## 补充：堆外内存 vs native memory（本机内存）
+
+面试里"堆外内存"和"native memory"经常被混着说，其实前者是后者的**真子集**：
+
+| 口径 | 范围 | 谁统计 |
+|------|------|--------|
+| **堆外内存 / 直接内存（Direct Memory）** | 仅 NIO `DirectByteBuffer` 经 `Unsafe.allocateMemory` 申请的那部分，受 `-XX:MaxDirectMemorySize` 约束 | `java.nio.Bits` 里的计数器 |
+| **native memory（本机内存）** | JVM 进程向**操作系统**申请的全部非堆内存，是 Direct Memory 的**超集** | NMT（Native Memory Tracking） |
+
+native memory 除了 Direct Memory，还包括：**线程栈**（每个 `-Xss`）、**JIT 生成的机器码**（Code Cache）、**类元数据**（Metaspace）、**GC 自身数据结构**（如 G1 的 RSet / 记忆集）、**JVM 内部结构**等。所以 `MaxDirectMemorySize` 只管住 Direct Memory 这一小块，管不住线程栈、Metaspace 那些。
+
+**怎么看这两块？**
+
+- 看**堆**（不是堆外）：`jcmd <pid> GC.heap_info`（旧版 `jmap -heap`），看新生代 / 老年代使用量。
+- 看 **native memory 明细**：`jcmd <pid> VM.native_memory summary`。
+  - 它的输出里确实有 `Java Heap` 一项——但**看堆不该用这条命令**。`VM.native_memory` 的立意是"JVM **进程**视角的各块内存"，把堆也一并列出来只是为了完整，不是看堆的主命令。
+  - 且 **NMT 默认关闭**，必须在**启动时**加 `-XX:NativeMemoryTracking=summary`（或 `detail`）才有输出；进程已经跑起来再 `jcmd` 也拿不到。
+
+> 一句话：**堆外内存 ⊂ native memory。`MaxDirectMemorySize` 只框住 DirectByteBuffer 那一块，native memory 还包含线程栈、JIT、元数据、GC 结构等；要看 native 全貌用 NMT（需启动时开启），要看堆用 `GC.heap_info`。**
 
 ---
 

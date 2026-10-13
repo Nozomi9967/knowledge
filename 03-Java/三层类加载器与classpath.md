@@ -5,7 +5,7 @@ tags:
   - 类加载
   - 双亲委派
 created: 2026-06-10
-updated: 2026-06-10
+updated: 2026-10-08
 ---
 
 # 三层类加载器与 classpath
@@ -58,6 +58,16 @@ updated: 2026-06-10
 | **核心内容** | 标准扩展库（JDK 的扩展功能，如加密扩展包） |
 
 > 实际面试中 Extension ClassLoader 问得较少，重点在前两个加载器。
+
+> [!warning] 路径修正 + JDK 9 起扩展机制已被移除
+> **① 上表路径是笼统写法，JDK 8 下严格是 `<JAVA_HOME>/jre/lib/ext`**（注意有 `/jre` 一层；或由 `java.ext.dirs` 系统变量指定），加载的是该目录下 **JAR 包里打包的 `.class`**，不是一堆散落的 class 文件。
+>
+> **② JDK 9 起扩展机制（Extension Mechanism）被彻底移除**，`ExtClassLoader` 随之**改名为「平台类加载器（PlatformClassLoader）」**：
+> - JDK 9 模块化后不再有 `jre/lib/ext` 这个目录，转而加载 **JDK 定义的平台模块**（`java.base` 之外的 Java SE 平台模块，如 `java.sql`、`java.xml` 等）；
+> - 三层结构变成：**启动类加载器 → 平台类加载器（PlatformClassLoader）→ 系统/应用类加载器（AppClassLoader）**；
+> - 所以 JDK 8 和 JDK 9+ 回答"三层类加载器"时，中层加载器的**名字和加载对象都不同**，面试被追问版本时要能区分。
+>
+> 详见 [[jvm八股#类加载器有哪些？]]（同一处已按「扩展类加载器（Java 8）/ 平台类加载器（Java 9+）」表述）。
 
 ### 3. Application ClassLoader（应用类加载器）
 

@@ -1,3 +1,9 @@
+---
+tags:
+  - 元数据
+created: 2026-06-28
+updated: 2026-06-28
+---
 # 学习进程
 
 - linux  [第二章-12-echo-tail-重定向符_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1n84y1i7td?spm_id_from=333.788.player.switch&vd_source=f05ff5730043ab849f9193ba325afc03&p=22)

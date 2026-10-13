@@ -1,3 +1,9 @@
+---
+tags:
+  - 其他
+created: 2026-06-28
+updated: 2026-06-28
+---
 # Feign /feɪn/（费恩）详解 — 声明式 HTTP 客户端
 
 > **关于名称**：Feign 原本是 Netflix 开源的声明式 HTTP 客户端，Netflix 停更后社区接手改名为 **OpenFeign**（GitHub: `OpenFeign/feign`）。Spring Cloud 在此基础上封装为 **Spring Cloud OpenFeign**，集成了 `@FeignClient`、Spring MVC 注解、负载均衡等能力。日常说的 "Feign" 通常指的就是 Spring Cloud OpenFeign。

@@ -8,6 +8,7 @@ created: 2026-06-03
 aliases:
   - "CPU缓存友好"
   - "embstr cache locality"
+updated: 2026-06-28
 ---
 
 ## 一句话概括

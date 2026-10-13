@@ -1,3 +1,9 @@
+---
+tags:
+  - redis
+created: 2026-06-28
+updated: 2026-07-31
+---
 ## XREADGROUP 的三种读取模式
 
 ```

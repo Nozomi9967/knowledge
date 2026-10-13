@@ -1,3 +1,9 @@
+---
+tags:
+  - java
+created: 2026-06-28
+updated: 2026-06-28
+---
 ### **`Class.newInstance()` 和 `Constructor.newInstance()` 都可以创建对象，但它们是不同的方法，各有优缺点**
 
 你的疑问指向了一个重要的细节——确实存在两种方式，而且它们的工作原理不同。

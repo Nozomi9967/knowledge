@@ -1,3 +1,9 @@
+---
+tags:
+  - java
+created: 2026-06-28
+updated: 2026-06-28
+---
 ## Sealed Classes（密封类）
 
 Sealed classes 是 Java 17 正式引入的特性（JEP 409），用于**限制哪些类/接口可以继承或实现某个类型**，从而对类层次结构进行精确控制。

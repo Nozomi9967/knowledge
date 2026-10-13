@@ -1,3 +1,9 @@
+---
+tags:
+  - redis
+created: 2026-06-28
+updated: 2026-07-31
+---
 
 ### Redis 3.0 之前（List 场景）
 

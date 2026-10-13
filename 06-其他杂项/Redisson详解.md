@@ -1,3 +1,9 @@
+---
+tags:
+  - 其他
+created: 2026-06-28
+updated: 2026-06-28
+---
 # Redisson 详解 — Redis 客户端 & 分布式解决方案
 
 > **关于名称**：Redisson 是 **Redis** + **son**（意为"Redis 之子"）的合成词，由 Redis 官方推荐的 Java 客户端之一。它不仅仅是简单的 Redis 客户端（如 Jedis/Lettuce），更是一个构建在 Redis 之上的 **内存数据网格（In-Memory Data Grid）**，提供了分布式锁、布隆过滤器、分布式集合、信号量、计数锁等 30+ 开箱即用的分布式数据结构。

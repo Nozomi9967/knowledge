@@ -1,3 +1,9 @@
+---
+tags:
+  - 其他
+created: 2026-06-28
+updated: 2026-06-28
+---
 **URI** (Uniform Resource Identifier) 和 **URL** (Uniform Resource Locator) 的关系：
 
 **URL 是 URI 的子集。**

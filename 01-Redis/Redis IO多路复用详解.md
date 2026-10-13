@@ -1,3 +1,9 @@
+---
+tags:
+  - redis
+created: 2026-06-28
+updated: 2026-10-13
+---
 ## Redis IO 多路复用机制详解
 
 ### 一句话先说明白

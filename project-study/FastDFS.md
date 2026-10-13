@@ -1,3 +1,9 @@
+---
+tags:
+  - 其他
+created: 2026-06-28
+updated: 2026-06-28
+---
 # FastDFS
 
 ## 架构图

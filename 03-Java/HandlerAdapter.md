@@ -1,3 +1,9 @@
+---
+tags:
+  - java
+created: 2026-07-31
+updated: 2026-07-31
+---
 ### **`HandlerAdapter` 是 `DispatcherServlet` 在初始化时从 Spring 容器中查找并加载的策略组件,用来"适配"不同类型的 Handler,让 DispatcherServlet 不必关心 Handler 的具体形态**
 
   

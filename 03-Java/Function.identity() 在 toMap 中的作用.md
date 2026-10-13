@@ -1,3 +1,9 @@
+---
+tags:
+  - java
+created: 2026-07-31
+updated: 2026-07-31
+---
 
 
 先看 `Collectors.toMap` 的签名：

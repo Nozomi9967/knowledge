@@ -8,6 +8,7 @@ created: 2026-06-04
 description:
 tags:
   - "clippings"
+updated: 2026-07-31
 ---
 > 原文地址： [面试官：多节点争抢资源， Redis 分布式锁是怎么实现的？ (opens new window)](https://mp.weixin.qq.com/s/SXDJpOphGTy1NLeEAL9FbA)
 

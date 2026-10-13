@@ -1,3 +1,9 @@
+---
+tags:
+  - 其他
+created: 2026-06-28
+updated: 2026-06-28
+---
 ## 什么是 kcat？
 
 kcat（原名 kafkacat）是一个**通用命令行非 JVM 的 Apache Kafka 生产者和消费者**工具。它被称作 "netcat for Kafka"，是用于检查和操作 Kafka 数据的"瑞士军刀"。

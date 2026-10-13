@@ -1,3 +1,9 @@
+---
+tags:
+  - redis
+created: 2026-06-28
+updated: 2026-06-28
+---
 好问题。这里的**内部节点**指的是 **quicklist 这个双向链表的每一个链表节点（listNode）**。
 
 ### quicklist 的结构（宏观到微观）

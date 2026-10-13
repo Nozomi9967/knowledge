@@ -1,3 +1,9 @@
+---
+tags:
+  - 其他
+created: 2026-06-28
+updated: 2026-06-28
+---
 
 # 为啥Paths.get("data","test.txt")结果的路径是项目根目录下的data目录 我的项目是微服务架构，一个父工程下有若干子工程 为啥在子工程也就是微服务中执行Paths.get("data","test.txt") 它的路径竟然是跟本身服务平级的data目录
 

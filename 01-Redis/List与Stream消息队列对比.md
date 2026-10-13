@@ -1,3 +1,9 @@
+---
+tags:
+  - redis
+created: 2026-06-28
+updated: 2026-07-31
+---
 ## List vs Stream 消息队列关键区别
 
 ### 核心差异：消息分发机制

@@ -1,3 +1,9 @@
+---
+tags:
+  - redis
+created: 2026-06-28
+updated: 2026-06-28
+---
 ## Redis 6.0 多线程 IO 的限制
 
 ### 一句话

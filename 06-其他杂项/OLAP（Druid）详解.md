@@ -1,3 +1,9 @@
+---
+tags:
+  - 其他
+created: 2026-06-28
+updated: 2026-06-28
+---
 # OLAP 解析 — Online Analytical Processing（联机分析处理）— Druid 详解
 
 ## 一句话定义

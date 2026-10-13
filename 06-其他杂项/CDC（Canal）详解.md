@@ -1,3 +1,9 @@
+---
+tags:
+  - 其他
+created: 2026-06-28
+updated: 2026-06-28
+---
 # CDC（Change Data Capture）— Canal 详解
 
 ## 一句话定义

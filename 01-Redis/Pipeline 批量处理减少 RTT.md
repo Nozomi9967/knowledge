@@ -1,3 +1,9 @@
+---
+tags:
+  - redis
+created: 2026-06-28
+updated: 2026-06-28
+---
 
 ### 问题背景：RTT 的开销
 

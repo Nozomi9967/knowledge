@@ -1,3 +1,9 @@
+---
+tags:
+  - 其他
+created: 2026-06-28
+updated: 2026-06-28
+---
 # MyBatis ResultMap — association & collection 详解
 
 ## 一句话

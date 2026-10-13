@@ -1,3 +1,9 @@
+---
+tags:
+  - 其他
+created: 2026-08-04
+updated: 2026-08-04
+---
 # ES Must 与 Filter 详解
 
 > 本文件是 [[06-其他杂项/ES详解]] 中 `must` vs `filter` 的独立详解延伸。主文件在性能优化表格中提到"Filter 代替 Must"，本文展开完整对比。

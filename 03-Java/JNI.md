@@ -1,3 +1,9 @@
+---
+tags:
+  - java
+created: 2026-07-31
+updated: 2026-07-31
+---
 ### **JNI（Java Native Interface）是 Java 调用本地代码（C/C++）的标准接口**
 
   

@@ -1,3 +1,9 @@
+---
+tags:
+  - java
+created: 2026-07-31
+updated: 2026-07-31
+---
 
 这两个都是 Java 8 引入的函数式接口，位于 `java.util.function` 包，是 CompletableFuture、Stream 等 API 的参数类型基础。
 

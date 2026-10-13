@@ -1,3 +1,9 @@
+---
+tags:
+  - spring
+created: 2026-10-13
+updated: 2026-10-13
+---
 
 ### **原理一句话：`WebApplicationType.deduceFromClasspath()` 挑了几个「标志类」，用 `ClassUtils.isPresent()` 逐个尝试加载——能加载成功就说明 classpath 上有对应框架，加载失败就是没有，纯粹靠 `Class.forName` 试探，没有任何魔法**
 

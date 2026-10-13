@@ -1,3 +1,9 @@
+---
+tags:
+  - mysql
+created: 2026-06-28
+updated: 2026-06-28
+---
 ## undo log 版本链
 
 每行记录都有两个隐藏字段：

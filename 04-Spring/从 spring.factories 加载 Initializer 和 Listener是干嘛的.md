@@ -1,3 +1,9 @@
+---
+tags:
+  - spring
+created: 2026-10-13
+updated: 2026-10-13
+---
 ### **一个在容器 refresh 之前「改装」ApplicationContext，一个监听 run() 全生命周期的事件——Initializer 改的是容器本身，Listener 是启动过程的观察者**
 
 #### **ApplicationContextInitializer：refresh 前对容器做最后定制**

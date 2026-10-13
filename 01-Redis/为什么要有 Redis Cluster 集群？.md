@@ -8,6 +8,7 @@ created: 2026-06-04
 description:
 tags:
   - "clippings"
+updated: 2026-06-28
 ---
 > 原文地址： [字节二面：你知道 Redis Cluster 集群工作原理吗？](https://mp.weixin.qq.com/s/2D1x3j6z8onpBKv6htBYYQ)
 

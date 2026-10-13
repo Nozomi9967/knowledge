@@ -1,3 +1,9 @@
+---
+tags:
+  - redis
+created: 2026-06-28
+updated: 2026-06-28
+---
 ## Redis 底层编码标准答案
 
 ### 1. String → SDS

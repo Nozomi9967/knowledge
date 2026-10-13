@@ -1,3 +1,9 @@
+---
+tags:
+  - redis
+created: 2026-06-28
+updated: 2026-07-31
+---
 ## Stream 的消息回溯能力（XRANGE）
 
 ### List 为什么做不到？

@@ -1,3 +1,9 @@
+---
+tags:
+  - java
+created: 2026-06-28
+updated: 2026-07-31
+---
 # Java 后端开发场景化面试题 50 道
 
 > 覆盖：Java 基础与并发、JVM、Spring/Spring Boot、MySQL、Redis、消息队列、分布式与微服务、系统设计与线上排障。

@@ -1,3 +1,10 @@
+---
+tags:
+  - 算法题
+  - 其他
+created: 2026-06-28
+updated: 2026-06-28
+---
 ## 看过思路但需要手敲的题
 
 https://leetcode.cn/problems/reverse-linked-list-ii/solutions/1992226/you-xie-cuo-liao-yi-ge-shi-pin-jiang-tou-teqq/?envType=study-plan-v2&envId=top-interview-150

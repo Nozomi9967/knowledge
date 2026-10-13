@@ -1,3 +1,9 @@
+---
+tags:
+  - redis
+created: 2026-06-28
+updated: 2026-06-28
+---
 
 > 范围：认识Redis → Redis数据结构 → Redis线程模型 → Redis持久化 → Redis集群
 > 题型：全部为简答题

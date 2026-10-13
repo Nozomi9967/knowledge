@@ -1,3 +1,9 @@
+---
+tags:
+  - spring
+created: 2026-10-13
+updated: 2026-10-13
+---
 ### **它不是某个处理器，而是 refresh() 里的一个步骤——名字直译就是「把容器里所有的 BeanFactoryPostProcessor 挨个回调一遍」。BeanFactoryPostProcessor（BFPP）是 Spring 的一个扩展点接口：bean 定义加载完、但一个 bean 都还没实例化之前，允许你修改 BeanFactory。CCPP 就是在这一步被叫起来干活的**
 
 #### **先看它站在哪：refresh() 的第三排**

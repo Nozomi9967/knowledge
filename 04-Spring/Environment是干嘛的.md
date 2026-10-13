@@ -1,3 +1,9 @@
+---
+tags:
+  - spring
+created: 2026-10-13
+updated: 2026-10-13
+---
 ### **Environment 是 Spring 的「配置总管」：一张按优先级排好序的属性源列表，外加 profile 状态；prepareEnvironment 干的事就是创建这个对象，把命令行参数、系统变量、环境变量、application.yml 全部灌进去——之后整个应用里 @Value("${...}") 和 @ConfigurationProperties 读的值都是从它这来的**
 
 先说句定位：这个不像上一轮的 RunListener 那么冷——Environment 是真高频核心，配置优先级、占位符解析、多环境 profile 这些经典面试题全都从它身上长出来，这个深度是值得花的。

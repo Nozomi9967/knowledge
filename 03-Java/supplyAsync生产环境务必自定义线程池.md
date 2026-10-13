@@ -1,3 +1,9 @@
+---
+tags:
+  - java
+created: 2026-07-31
+updated: 2026-07-31
+---
 
 > 秋招重点：supplyAsync 不指定线程池时使用 ForkJoinPool.commonPool()，在 CPU 密集型任务场景下容易和其他 ForkJoin 任务抢资源，生产上务必自定义线程池。
 

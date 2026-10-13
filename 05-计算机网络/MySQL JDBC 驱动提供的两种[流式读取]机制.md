@@ -1,3 +1,9 @@
+---
+tags:
+  - 计算机网络
+created: 2026-07-02
+updated: 2026-07-02
+---
 
 
 **`useCursorFetch=true` 和 `setFetchSize(Integer.MIN_VALUE)` 是 MySQL JDBC 驱动提供的两种"流式读取"机制，目的是让 50w 条数据不一次性塞进客户端内存，而是按需分批从服务端拉取。**

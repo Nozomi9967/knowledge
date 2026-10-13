@@ -1,3 +1,9 @@
+---
+tags:
+  - java
+created: 2026-07-31
+updated: 2026-07-31
+---
 ### **Spring WebFlux 是基于 Reactor 的响应式 Web 框架，采用非阻塞 I/O 与事件循环模型,适合高并发、I/O 密集型场景**
 
   

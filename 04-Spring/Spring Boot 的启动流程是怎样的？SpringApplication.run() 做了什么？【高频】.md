@@ -1,3 +1,9 @@
+---
+tags:
+  - spring
+created: 2026-10-13
+updated: 2026-10-13
+---
 
 来自[[SpringBoot 热门面试题]]
 

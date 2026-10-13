@@ -1,3 +1,9 @@
+---
+tags:
+  - 其他
+created: 2026-08-05
+updated: 2026-08-05
+---
 # ES Segment（段）详解
 
 > 本文件是 [[06-其他杂项/ES详解]] 中 Segment 机制的独立详解延伸。主文件在写入流程和面试题中提及了 refresh、NRT 等概念，本文展开 Segment 的完整原理。

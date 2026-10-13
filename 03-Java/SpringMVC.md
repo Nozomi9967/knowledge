@@ -1,3 +1,9 @@
+---
+tags:
+  - java
+created: 2026-07-31
+updated: 2026-07-31
+---
 ### **Spring MVC 是基于 Servlet API 的同步阻塞式 Web 框架,以 DispatcherServlet 为核心,采用一请求一线程模型处理 HTTP 请求**
 
   

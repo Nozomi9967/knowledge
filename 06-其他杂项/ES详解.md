@@ -1,3 +1,9 @@
+---
+tags:
+  - 其他
+created: 2026-06-28
+updated: 2026-06-28
+---
 # Elasticsearch详解 — 分布式搜索引擎
 
 > **关于名称**：Elasticsearch 简称 **ES**，是 Elastic Stack（ELK）核心组件，基于 **Apache Lucene** 的分布式搜索引擎。提供 RESTful API，支持全文搜索、结构化搜索、聚合分析等能力。母公司 Elastic 于 2018 年在纽交所上市（NYSE: ESTC）。

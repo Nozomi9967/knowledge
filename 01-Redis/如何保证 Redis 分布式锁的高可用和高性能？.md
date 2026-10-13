@@ -8,6 +8,7 @@ created: 2026-06-04
 description:
 tags:
   - "clippings"
+updated: 2026-06-28
 ---
 > 原文地址： [面试官：如何保证分布式锁的高可用和高性能？](https://mp.weixin.qq.com/s/F3fU8YyZ3AI29hiNU1iIEg)
 

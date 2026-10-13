@@ -1,3 +1,9 @@
+---
+tags:
+  - java
+created: 2026-10-13
+updated: 2026-10-13
+---
 # Class 类详解
 
 ## 一、Class 是什么

@@ -4,6 +4,7 @@ tags:
   - interview
   - star
 created: 2026-06-04
+updated: 2026-06-28
 ---
 
 # Redis fork 全量同步优化案例

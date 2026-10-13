@@ -1,3 +1,9 @@
+---
+tags:
+  - 其他
+created: 2026-06-28
+updated: 2026-06-28
+---
 以下是 **Sentinel 在 SpringBoot 3.2.5 + Spring Cloud Gateway** 场景下的完整使用指南。
 
 > [!info] 已升级至规范页

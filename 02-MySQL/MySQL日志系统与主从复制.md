@@ -240,6 +240,8 @@ binlog是 **Server层** 生成的二进制日志
    - binlog 适用于所有存储引擎，因为它是在 Server 层
 
 2. **文件格式不同**
+   - redo log 是**物理日志**，记录"在某个数据页上做了什么修改"
+   - binlog 是**逻辑日志**，记录的是语句或行级的逻辑变更。binlog 有三种记录格式：**STATEMENT / ROW / MIXED**，5.7 默认 statement、8.0 默认 row。三者的区别、取舍和面试话术见 [[binlog三种格式（statement-row-mixed）]]
 
 3. **写入方式不同**
    - redo log 是**循环写**，写满就重头写

@@ -1,0 +1,340 @@
+Spring MVC的工作流程是怎样的？
+请求先到达DispatcherServlet，DispatcherServlet收到请求后会调用处理器映射器HandlerMapping，
+HandlerMapping会根据请求的url生成具体的处理器执行链HandlerExecutionChain返回给DispatcherServlet
+接着DispatcherServlet会遍历已注册的处理器适配器HandlerAdapter,找到支持当前处理器类型的适配器
+然后HandlerAdapter对请求进行一系列预处理操作后，会调用具体的handler执行业务逻辑
+执行完后返回ModelAndView给DispatcherServlet，DispatcherServlet收到后将其交给ViewResolver进行视图解析
+最后由DispatcherServlet将解析后的view返回给用户
+
+
+SpringBoot用到哪些设计模式？
+代理模式：SpringAOP通过动态代理实现了方法级别的切面增强
+策略模式：SpringAOP支持JDK和Cglib两种动态代理方式，通过策略接口和不同实现类，实现运行时动态选择。策略实现类的创建一般由工厂方法实现
+单例模式：SpringBean默认是单例
+简单工厂模式：Spring中的BeanFactory就是其体现
+适配器模式：SpringMVC针对不同方式定义的Controller，利用适配器模式统一了函数定义，定义了统一接口HandlerAdapter和对应适配器类
+
+如何理解 Spring Boot 中的“约定大于配置”？
+约定大于配置是SpringBoot的核心理念，即通过提供合理的默认配置和统一的开发规范，减少开发者手动配置的工作量，从而提高开发效率
+
+说一下Bean的生命周期？
+大体分为五个阶段
+第一个是实例化，容器会根据BeanDefinition通过反射获取到构造器创建实例
+第二个是属性注入，根据@Autowired,@Resource注入依赖
+第三个是初始化，首先会依次执行Aware回调，例如BeanNameAware,BeanFactoryAware,ApplicationContextAware等等
+然后依次执行@PostConstruct方法 InitializingBean接口的afterPropertiesSet方法 init-method指定的方法
+第四步是使用bean
+第五个是销毁bean，容器关闭时会依次执行@preDestroy方法 DisposableBean的destroy方法 destroy-method指定的方法
+Aware 和 @PostConstruct 这类注解回调，本质都是容器内置的 BeanPostProcessor 在初始化前后插入执行的。
+
+说一下你对 Spring 的理解？
+Spring本质是一个Java后端开发框架，核心作用是帮我们管理Java对象，它最重要的特性是IOC控制反转，以前我们自己new对象自己管理依赖
+现在只需告诉容器需要什么对象，它就会自动创建并注入
+其次是AOP，它将日志、权限校验、事务管理这些横切逻辑抽取了出来，不用在每个方法重复编写	
+Spring的生态也很丰富，SpringBoot快速搭建应用，SpringCloud搭建微服务，SpringMVC处理Web请求，SpringData简化数据库操作
+
+
+什么是 IoC？和 DI 有什么区别？
+IOC也就是控制反转，控制指的是创建对象以及对象间的依赖管理，原来A依赖B，那么我们需要在A中newB，控制权在A，现在我们只需声明依赖，容器帮我们创建并注入，控制权在容器
+DI是实现IOC的具体技术手段，可以通过构造器/setter/字段注入
+
+
+IoC 的实现机制是什么？
+IOC通过工厂模式和反射机制实现
+容器启动时会扫描@Component等注解下的类，解析出BeanDefinition后注册，然后通过BeanFactory利用反射机制拿到构造器创建实例，再通过反射进行属性注入，最后执行初始化回调
+
+
+BeanFactory 和 ApplicationContext 有什么区别？
+BeanFactory是Spring最底层的IOC容器，它提供最基本的getBean能力，采用懒加载，只有真正获取时才创建Bean
+ApplicationContext是BeanFactory的子接口，它额外提供AOP，资源加载，事件发布等企业级功能，采用预加载，容器启动时就加载单例Bean
+启动稍慢但运行时性能好，我们平时开发用到的容器都是ApplicationContext
+
+@Autowired 和 @Resource の区别？
+@Autowired是Spring提供的注解，@Resource是jdk自带的
+@Autowired是根据类型注入，当存在多个同类型时需要通过@Qulifier指定
+@Resource是根据名称注入，找不到再按类型
+
+为什么推荐构造器注入？
+原因主要有三个
+第一个是利于单元测试，构造器方法是普通的java方法，就算没有Spring也可以实现手动new传参并mock注入，而且这样单元测试更快更干净
+第二个是利于排查循环依赖，但存在循环依赖时容器会因构造器参数不满足而启动时就报错，但用字段注入时，报错会延迟到第一次调用字段时
+构造器注入无法被三级缓存解决，遇到循环依赖会直接启动失败，从而强制暴露设计问题；而字段/Setter 注入会被三级缓存"掩盖"循环依赖，让问题潜伏下来。因此推荐构造器注入是为了尽早暴露循环依赖、倒逼重构，而不是"延迟报错"。
+第三个是字段可以加final，final修饰的字段要求在声明时或在构造器中完成赋值，而采用字段注入时Spring的反射赋值发生在初始化之后	
+
+Bean 的作用域有哪些？
+Singleton整个容器内单例
+Prototype每次调用时创建新的Bean
+Request每个Http请求一个
+Session会话内单例
+Application ServletContext范围内单例
+Websocket Websocket会话内单例
+
+singleton Bean 注入 prototype Bean 会怎样？怎么解决？ 
+多例Bean只会在被调用时新建，而如果单例Bean依赖多例Bean，由于单例Bean只会在容器启动时创建一次，那么所依赖的多例Bean也只能在属性注入时被创建一次，此后用到的都是创建时的这个多例Bean
+从而导致prototype语义失效
+可以通过加@Lookup或用ObjectProvider解决
+
+
+@Lookup 和 ObjectProvider 的原理是什么？
+这两个的原理都是把getBean的调用从注入时延迟到实际被调用时
+Spring会为被@Lookup修饰的方法所在Bean生成Cglib代理子类，并重写该方法，方法体变为getBean每次从容器拿新的实例
+而ObjectProvider是Spring的延迟引用对象，ObjectProvider本身一开始就被注入，但目标Bean只有实际通过getObject/getIfAvialbe调用时才会创建
+
+单例 Bean 会有线程安全问题吗？怎么解决？
+Spring只保证创建bean时线程安全，创建完后就不管了，如果bean使用可变成员变量，在多线程下就有可能出现线程安全问题
+可以通过创建无状态bean解决，状态通过参数传递
+还可以用ThreadLocal存储线程状态
+或使用JUC并发类，以及通过synchronized reentrantlock加锁保证线程安全
+或者直接使用prototype bean每次调用新建实例，从根本上解决了线程安全问题
+
+
+Spring 怎么解决循环依赖？
+通过三级缓存可以解决单例bean setter/字段注入的循环依赖问题，解决不了多例bean和构造器注入循环依赖
+一级缓存是singletonObjects，存放完全初始化好的bean
+二级缓存是earlySingletonObjects，存放提前暴露的早期引用 
+三级缓存是singletonFactorys，存ObjectFactory工厂
+以A依赖B，B依赖A为例
+创建A的实例后，把A的ObjectFactory放入三级缓存，接着给A属性注入，发现B，创建B的实例，给B属性注入，发现A，依次寻找一二三级缓存，三级缓存找到A
+调用getObject，若A需要AOP代理则生成代理对象，放入二级缓存，删掉三级缓存，B拿到A的引用后完成属性注入，B初始化完成后放入一级缓存，A注入B，A初始化完成后放入一级缓存
+
+
+为什么用三级缓存而不是两级？
+如果没有三级缓存只有两级意味着A在创建实例后就要把引用放入二级缓存，如果A需要代理的话，那么B在属性注入时拿到的是未代理的实例，而当A注入B后，A又会创建一个代理对象放入一级缓存
+从而出现单例bean出现多例实例的情况
+
+为什么还需要二级缓存？早期引用为什么不能放一级缓存？
+如果没有二级缓存，只有三级缓存的话，同样会出现单例bean多实例的情况
+假如A与B互相依赖，A与C互相依赖
+A属性注入B、C，BC在各自属性注入阶段会分别调用getObject，从而导致多实例，而且他们拿到的并不是最终的代理A
+二级缓存的作用就是“缓存第一次 getObject 的结果”。B 拿过一次后，C 再来要 A 的早期引用时，直接从二级缓存拿同一个对象，不再重复调工厂方法。没有二级缓存，每次都走三级缓存的 ObjectFactory，就可能每次 new 出一个不同的代理，破坏单例。
+首先一级缓存的语义就是存放完全初始化好的bean，其次，就算放一级缓存，B拿到的也不是最终的A代理对象
+
+
+
+什么是 AOP？解决什么问题？
+AOP 也就是面向切面编程。它将日志、权限、校验、事务管理这些与业务逻辑无关，但又在多处重复使用的横切逻辑抽取出来统一管理，让业务代码变得更加清晰清爽。
+
+它是 OOP 的补充：
+1. OOP 负责从继承链中抽象强共性。
+2. AOP 统一处理跨多个类的弱共性。
+
+比如 100 个 Service 方法都需要加日志和事务管理：
+(a) 没有 AOP 的话，需要在每一个方法里写 100 遍 try-catch 提交。
+(b) 用 AOP 的话，统一在另一个切面就能全覆盖。
+
+AOP 基于动态代理运行期植入，无需专用编译器。
+Spring AOP 基于动态代理运行期植入，无需专用编译器。
+
+什么是织入？Spring AOP 为什么无需专用编译器？
+植入指的是将切面代码应用到目标对象的过程，主要有三种植入时机：
+
+1. 编译期植入：
+在编译时直接将切面代码植入到目标类的字节码中。普通 Java 编译器办不到，需要用 AspectJ 的 AJC 特殊专用编译器。
+
+2. 类加载器植入：
+JVM 在加载类的同时，通过 Java Agent 将切面代码植入到字节码中。
+
+3. 运行期植入：
+运行时动态生成代理对象，拦截方法调用。Spring AOP 就是基于运行期植入。在 JVM 跑起来之后，它会通过 JDK 动态代理或 CGLIB 生成目标类的代理对象，把切面逻辑包在代理里。代理对象拦截方法调用，被代理拦截后转发到切面，再到目标方法。这完全基于 Java 的原生能力和普通类库，无需专用编译器，无需改造，无需额外工具链。
+
+Spring AOP 的核心概念有哪些？
+牛的核心概念有哪些？
+
+1. 核心概念：
+(a) 切面：@Aspect
+(b) 连接点：Join point（指的是具体代码执行点）
+(c) 切点：Point cut（指的是可以用 execution 表示的确定表达式）
+(d) 通知：Advice（植入）
+(e) 目标对象：Target
+(f) 代理对象：Proxy
+
+2. 通知主要有 5 类：
+(a) 前置通知：@Before
+(b) 后置通知：@After
+(c) 返回后通知：@AfterReturning
+(d) 异常后通知：@AfterThrowing
+(e) 环绕通知：@Around
+
+JDK 动态代理和 CGLIB 的区别？
+1. JDK 动态代理：
+(a) 实现原理：基于接口生成代理对象，要求目标类至少要实现一个接口。
+(b) 实现方式：通过 InvocationHandler 以及 java.lang.reflect.Proxy 类，通过反射调用目标对象来实现。
+
+2. CGLIB 代理：
+(a) 实现原理：直接继承目标类生成代理子类，因此不要求目标类实现接口，但无法给 final 类或 final 方法生成代理子类。
+(b) 实现方式：通过第三方字节码生成库来生成代理子类实现。
+在性能上，CGLIB 生成较慢，但运行效率好；JDK 与其相反。在 Spring Boot 2.0 之后，默认使用的是 CGLIB。
+
+
+Spring AOP 和 AspectJ 的区别？
+Spring AOP 和 AspectJ 的区别：
+
+1. Spring AOP：
+(a) 机制：基于运行时动态代理机制。
+(b) 拦截范围：只支持方法级拦截，且只能拦截被 Spring 容器管理的 Bean。
+
+2. AspectJ：
+(a) 机制：是独立的 AOP 框架，支持编译器、类加载器植入。
+(b) 拦截范围：可以在方法、字段、构造器等任何位置进行拦截。
+(c) 性能：性能更好。
+
+实际项目中，大部分都使用 Spring AOP，只有在需要植入第三方框架或自带监控的时候，才会用到 AspectJ。
+
+AOP 的应用场景有哪些？
+AOP 的应用场景有哪些？有日志记录、权限校验、性能监控、事务管理、缓存构建。
+
+
+说说你对 Spring 事务的理解？
+
+
+@Transactional 在哪些情况下会失效？
+
+
+Spring 事务的隔离级别有哪些？
+
+
+说说 Spring 的事务传播机制？
+
+
+MyBatis 执行 SQL 的完整流程是什么？
+Mapper动态代理拦截方法调用，查找对应的MappedStatement，接着由执行器查找二级缓存、一级缓存，都没有继续往下，StatementHandler创建Statement
+ParameterHandler设置参数，JDBC执行sql，然后由ResultSetHandler映射结果并返回
+
+
+
+MyBatis 的 Mapper 接口为什么不需要写实现类？
+mapper接口在启动时会通过JDK动态代理创建代理对象，当某个方法被调用时，代理对象会拦截方法调用，根据方法名和namespace找到对应的MappedStatement，执行sql并返回结果
+
+MyBatis 和 JDBC 相比有什么优势？
+JDBC的话，我们需要获取Connection，创建Statement，配置参数，执行sql，遍历ResultSet封装对象，关闭资源
+而我们使用Mybatis只需要写sql和定义结果映射即可
+
+MyBatis 的二级缓存有什么问题？什么场景下会禁用？
+MyBatis 的二级缓存在多个mapper操作同一个表时会出现脏读问题，二级缓存的作用范围是namespace，当一个mapper更新了该表，
+另一个mapper是看不见的另一个mapper的缓存是不会更新的，从而导致脏读
+
+
+手写 MyBatis 复杂 SQL 时有什么性能优化的经验？
+分页查询用LIMIT，而不是都查出来在内存中做筛选
+用JOIN做关联查询避免N+1问题
+大批量插入时用BatchExecutor或用foreach拼接插入语句
+尽量避免使用resultMap的autoMapping，最好显示指明
+
+
+LambdaQueryWrapper 凭什么能防止 SQL 注入？
+LambdaQueryWrapper传的是方法引用而不是字符串，编译时方法引用就确定好了字段名，不会出现字符串拼接导致的注入问题
+MP 底层生成 SQL 时参数一律用 #{} 占位符，通过 PreparedStatement 绑定值，所以防注入；Lambda 只是替代手写字符串列名，属于便利性和类型安全，不是防注入的关键。
+
+MyBatis-Plus 分页插件原理？
+MP通过MyBatisPlusInterceptor拦截Executor的query方法
+当检测到参数中包含Page对象时，会自动执行两个动作
+1. select count(*) from 原sql 查总数
+2. 在原sql末尾拼接上 limit ? offset ?
+
+为什么用 MyBatis-Plus 而不是 JPA？
+JPA是ORM全自动方案，开发者不需要手写sql，但电商项目往往查询比较复杂，比如多表查询、动态参数、分页查询等等，在这些情况下JPA的可控性和可读性都不如手写sql
+而我们选择的是MP，简单CRUD直接用baseMapper零sql，复杂查询用条件构造器或xml
+
+什么是 SPI？和 API 有什么区别？
+SPI是服务提供者接口，由JDK或框架提供接口，第三方jar提供实现，运行时通过META-INF/services下的描述文件自动发现并加载
+API是框架实现好了给我用，SPI是框架提供接口，实现方提供实现，框架调用实现方
+JDBC就是例子，java.sql.Driver由jdk定义，mysql驱动jar里写一行描述文件，DriverManager启动时自行加载，所以JDBC4.0后不用手动写Class.forName		
+
+
+SPI 加载的实现类在 classpath 上，Bootstrap 怎么加载到？
+靠线程上下文类加载器，按理来说，java.sql.Driver类在rt.jar由Bootstrap加载，而mysql驱动实现类在classpath由App加载
+根据双亲委派机制，BootStrap看不到classpath，无法加载实现类。
+所以ServiceLoader用线程上下文类加载器（一般是App）作为中间桥梁去加载驱动实现类
+
+
+JDBC 是什么？驱动是什么？
+JDBC是java官方的数据库访问规范，java.sql.*下全是接口；
+驱动是对JDBC接口的实现，主要是把JDBC调用翻译为数据库自己的网络协议，通过socket与服务器收发数据
+
+
+Statement 和 PreparedStatement 区别？
+PreparedStatement会进行预编译，用户输入只作为参数，不参与sql语法解析，不会出现注入问题
+而且因为PreparedStatement会编译sql骨架，所以它在循环执行固定sql时性能更好
+
+
+为什么需要连接池？
+新建一次连接需要走TCP三次握手、数据库权限校验、会话初始化，几十上百毫秒，扛不住高并发
+通过连接池将创建/销毁变成了借还，减少了资源消耗，大大提高了并发性能
+
+Class.forName 还需要写吗？
+JDBC4.0之后就不用写了，DriverManager会通过ServiceLoader自动加载mysql驱动jar包下的SPI描述文件
+(META-INF/services/com.sql.Driver
+(META-INF/services/java.sql.Driver
+
+
+ JDBC 和 MyBatis / JPA 什么关系？
+ORM框架在JDBC之上，MyBatis读出来xml中的sql后需要走PareparedStatement执行，JPA/Hibernate把实体注解翻译为sql之后同样走JDBC
+
+JDBC 怎么保证事务？
+setAutoCommit=false，全部成功就提交，抛异常就回滚，事务挂在线程上
+JDBC 事务和 Connection 绑定，setAutoCommit(false) 后同一 Connection 上的操作属于同一事务，成功 commit、异常 rollback。​
+
+
+
+Seata AT 和 TCC 怎么选？
+如果业务比较复杂、对并发性能要求不是很高建议选AT，因为它对业务逻辑零侵入，价格@GlobalTransaction就能用
+如果对性能要求比较高、并且需要进行读隔离选TCC，它需要自行实现Try Confirm Cancel三阶段接口，更灵活，且没有全局行锁
+
+AT 模式的全局锁会不会成为性能瓶颈？
+会，在一阶段结束后本地事务会提交，同时会加上对该行数据的全局行锁，再全局事务结束前，其他事务都不能修改该数据
+
+undo log 满了怎么办？undo_log 表会不会无限膨胀？
+undo_log中的记录会在二阶段事务提交时被删除，所以一般来说不会无限膨胀
+
+AT 模式如何保证隔离性？
+AT模式通过全局行锁保证写隔离，但读没做隔离，一阶段本地事务提交后，所做的修改其他事务可以看见，导致脏读
+需要读隔离可以用TCC自行实现
+
+Seata 和消息队列（RocketMQ）事务消息的区别？
+Seata是强一致性方案，RocketMQ是最终一致性方案
+下单这种强一致性的需要用seata，支付日志这种用mq就行
+
+项目中有没有因为引入 Seata 踩过坑？
+有的
+undo_log表要提前手动建好，而且字符集要用utf8mb4，不然会乱码
+还有，要将@GlobalTransaction加在全局事务发起者的最外层入口方法，不能让@Transactional包在它外边，不然会导致全局事务生命周期错乱导致空提交的问题
+还有，seata跟mp一起用时，会导致mp的插件集体失效，这是因为seata代理数据源时会自己建sqlFactory，把mp的工厂顶掉
+还有，feign调用的时间要设置长一些，因为全局事务要调用多个分支事务通常比本地事务要耗时
+
+
+redis SCAN
+SCAN cursor pattern count type
+cursor:右边，传0表示开启新一轮迭代，命令返回的第一个元素就是下次要用的游标，返回游标为0表示迭代结束
+pattern:模式过滤，该过滤是在取出元素之后，返回客户端之前，因此返回元素为空并不代表遍历结束
+count:每次大约扫描多少个哈希桶，只是提示
+type:指定扫描key的类型
+
+几个坑点
+1. 结束只看游标是否为0，有时会由于patter的过滤返回结果为0，但不能据此判定为遍历结束
+2. 如果在遍历过程中对某个key进行修改，返回结果中可能有该key可能没有
+3. 返回结果不保证不重复，由于SCAN的遍历顺序和rehash兼容有关，缩容时可能会重复访问某些桶
+4. count只是提示，并不保证一定每次扫count桶
+
+为什么 SCAN 结果可能重复？客户端怎么处理？
+因为SCAN的游标用的是逆二进制迭代法，先反转二进制+1后再反转回来，这样可以保证扩容缩容时不漏，但不保证不重复
+客户端需要在内存中自行去重
+
+消费者组是Stream的核心机制，当消费者通过XREADGROUP主动拉取消息时，
+redis会根据该组的last-delivered-id将尚未交付的消息分配给发起请求的消费者，实现组内负载均衡
+正常情况下，每条消息只会被组内一个消费者处理
+但redis stream是基于PEL的至少一次交付语义，消费者读取消息后必须显示的调用ACK确认，
+否则消息会一直留在PEL中标为"已交付但未确认状态"。
+如果消费者宕机，其他消费者可以通过XCLAIM或XAUTOCLAIM将这些消息重新认领并消费
+因此在故障恢复场景下，同一条消息可能被两个不同的消费者处理，业务侧需要做好幂等处理
+sk-4e61ddc50c274bd99a64d556affb3ce0
+sk-m2cs7ty8ux7fd17rvr7ipoo8xu5rrsob
+
+
+refresh里的重点是：
+首先是执行BeanFactory后置处理器，核心是ConfigurationClassPostProcessor
+他负责把业务类和自动配置类注册为BeanDefinition，并对@Configuration做CGLIB增强
+然后是注册Bean后置处理器，AOP等BeanPostProcessor都是在这里注册的，为后面的依赖注入、AOP代理做准备
+接着是onRefresh这个钩子方法，在这里Web应用会创建内嵌Tomcat
+然后是finishBeanFactoryInitialization，在这里会实例化所有非懒加载实例，属性注入、初始化回调、AOP代理都发生在这一步
+最后是finishRefresh，发布ContextRefreshedEvent，并通过Lifecycle机制真正的start Tomcat，监听端口
+回到run方法，最后会发布started事件、执行Runner，发布ready，应用启动完毕

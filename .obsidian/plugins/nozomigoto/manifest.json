@@ -1,0 +1,10 @@
+{
+  "id": "nozomigoto",
+  "name": "望みごと",
+  "version": "1.0.0",
+  "minAppVersion": "1.4.0",
+  "description": "一键把当前笔记的背诵/学习记录到汇总笔记，并调用可配置 AI 基于当前笔记生成口述风格的面试题，追加到当前文件。",
+  "author": "Nozomi",
+  "authorUrl": "",
+  "isDesktopOnly": false
+}

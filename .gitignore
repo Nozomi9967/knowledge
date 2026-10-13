@@ -1,20 +1,40 @@
-# 默认忽略所有
-/*
+# ─────────────────────────────────────────────
+# 八股知识库 .gitignore
+# 策略：默认纳入全部内容（笔记要可回退），
+#       仅排除「版本历史 / 缓存 / 大媒体 / 构建产物」四类
+# ─────────────────────────────────────────────
 
-# 只保留 01-04 知识库（手机同步用）
-!/01-Redis/
-!/01-Redis/**
-!/02-MySQL/
-!/02-MySQL/**
-!/03-Java/
-!/03-Java/**
-!/04-Spring/
-!/04-Spring/**
-!.gitignore
+# ── Syncthing 版本历史与状态（89MB，含安装包，绝不入库）──
+.stversions/
+.stfolder/
+.stfolder.removed-*/
 
-# Syncthing 同步冲突副本（自动生成，不入库）
+# ── Syncthing 同步冲突副本（自动生成）──
 *.sync-conflict-*
 
-# 系统文件
+# ── 编辑器 / AI 工具本地状态与缓存 ──
+**/.obsidian/workspace.json
+**/.obsidian/workspace-mobile.json
+**/.obsidian/cache/
+**/.obsidian/plugins/*/main.js
+**/.obsidian/plugins/*/*.bak-*
+.claude/
+.claudian/
+.workbuddy-ai/
+
+# ── 构建产物 ──
+*.class
+target/
+build/
+node_modules/
+__pycache__/
+*.pyc
+
+# ── 大体积媒体（面试录音，共约 84MB）──
+*.wav
+*.mp3
+
+# ── 系统文件 ──
 .DS_Store
 Thumbs.db
+desktop.ini

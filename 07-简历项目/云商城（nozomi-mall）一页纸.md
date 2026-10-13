@@ -239,7 +239,7 @@ shop_goods shop-search  shop      shop_order  shop_pay  shop_seckill
 
 ## 关联知识点
 
-- 组件详解：[[Seata详解]] · [[CDC（Canal）详解]] · [[RocketMQ详解]] · [[RocketMQ事务消息详解]] · [[Redisson详解]] · [[ES详解]] · [[Nacos详解]] · [[Feign详解]] · [[Gateway限流]] · [[OLAP（Druid）详解]] · [[MyBatis-Plus详解]] · [[fastDFS]]
+- 组件详解：[[Seata详解]] · [[CDC（Canal）详解]] · [[RocketMQ详解]] · [[RocketMQ事务消息详解]] · [[Redisson详解]] · [[ES详解]] · [[Nacos详解]] · [[Feign详解]] · [[Gateway限流]] · [[OLAP（Druid）详解]] · [[MyBatis-Plus详解]] · [[FastDFS]]
 - 八股对照：[[数据库和缓存如何保证一致性？]] · [[什么是缓存雪崩、击穿、穿透？]] · [[多节点争抢资源， Redis 分布式锁是怎么实现的？]] · [[ES must与filter详解]] · [[CAP定理详解]]
 - 本项目其他页：[[云商城已知硬伤与追问预案]] · [[云商城压测方案（成果数字怎么跑出来）]]
 - 项目原始资料：[[面试分析报告]]（更早的自写分析，⚠ 其技术栈表首行 Spring Boot 版本号有误，已在该页加 warning 标注）· [[开发学习日志]]（OpenResty/Lua/Kafka/Druid 等服务器侧的真实操作记录）· [[Spring Boot 与 Spring Cloud Alibaba 的关系]]

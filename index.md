@@ -302,7 +302,7 @@
 - [[虚拟线程详解]] — Java 21 虚拟线程（Project Loom）原理与适用场景
 
 ### 文件存储
-- [[fastDFS]] — 分布式文件系统架构与使用
+- [[FastDFS]] — 分布式文件系统架构与使用
 
 ### ORM / 持久层
 - [[MyBatis详解]] — 半自动 ORM 框架，SQL Mapping、动态 SQL、结果映射、缓存机制

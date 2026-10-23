@@ -4,7 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e5fab484-6fb9-421e-aa21-0bd7096def54" name="更改" comment="" />
+    <list default="true" id="e5fab484-6fb9-421e-aa21-0bd7096def54" name="更改" comment="">
+      <change beforePath="$PROJECT_DIR$/../.obsidian/plugins/nozomigoto/data.json" beforeDir="false" afterPath="$PROJECT_DIR$/../.obsidian/plugins/nozomigoto/data.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.obsidian/plugins/remember-cursor-position/cursor-positions.json" beforeDir="false" afterPath="$PROJECT_DIR$/../.obsidian/plugins/remember-cursor-position/cursor-positions.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../03-Java/Java基础热门面试题.md" beforeDir="false" afterPath="$PROJECT_DIR$/../03-Java/Java基础热门面试题.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Main.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -17,6 +23,9 @@
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
 }</component>
@@ -24,33 +33,35 @@
   <component name="ProjectViewState">
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/q1948/Desktop/八股/java-base/pom.xml&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;模块&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.inline.completion&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;,
-    &quot;应用程序.AlternatePrint100.executor&quot;: &quot;Run&quot;,
-    &quot;应用程序.AlternatePrintLP.executor&quot;: &quot;Run&quot;,
-    &quot;应用程序.KMP.executor&quot;: &quot;Run&quot;,
-    &quot;应用程序.Main.executor&quot;: &quot;Run&quot;,
-    &quot;应用程序.PC_BlockingQueue.executor&quot;: &quot;Run&quot;,
-    &quot;应用程序.PC_WaitNotify.executor&quot;: &quot;Run&quot;,
-    &quot;应用程序.PrintABC.executor&quot;: &quot;Run&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "master",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/q1948/Desktop/八股/java-base/pom.xml",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "模块",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "editor.preferences.inline.completion",
+    "vue.rearranger.settings.migration": "true",
+    "应用程序.AlternatePrint100.executor": "Run",
+    "应用程序.AlternatePrintLP.executor": "Run",
+    "应用程序.KMP.executor": "Run",
+    "应用程序.Main.executor": "Run",
+    "应用程序.PC_BlockingQueue.executor": "Run",
+    "应用程序.PC_WaitNotify.executor": "Run",
+    "应用程序.PrintABC.executor": "Run"
   }
-}</component>
-  <component name="RunManager" selected="应用程序.PrintABC">
+}]]></component>
+  <component name="RunManager" selected="应用程序.Main">
     <configuration name="AlternatePrint100" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="AlternatePrint100" />
       <module name="java-base" />
@@ -65,8 +76,8 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="PC_BlockingQueue" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="PC_BlockingQueue" />
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="java-base" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -88,11 +99,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="应用程序.Main" />
         <item itemvalue="应用程序.PrintABC" />
         <item itemvalue="应用程序.AlternatePrintLP" />
         <item itemvalue="应用程序.AlternatePrint100" />
         <item itemvalue="应用程序.PC_WaitNotify" />
-        <item itemvalue="应用程序.PC_BlockingQueue" />
       </list>
     </recent_temporary>
   </component>
@@ -126,6 +137,7 @@
       <workItem from="1790492067528" duration="229000" />
       <workItem from="1790825159662" duration="3049000" />
       <workItem from="1791684065673" duration="617000" />
+      <workItem from="1791889058191" duration="5129000" />
     </task>
     <servers />
   </component>

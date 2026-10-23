@@ -5,7 +5,7 @@ tags:
   - 性能优化
   - JVM
 created: 2026-06-28
-updated: 2026-10-07
+updated: 2026-10-14
 ---
 
 # 同事写了 `String s = "a" + i + "b" + j;` 在循环里拼接 10 万次出现 CPU 飙高，请解释 JDK 8 与 JDK 17 下编译器分别如何处理，以及你会怎么改写。
@@ -26,13 +26,25 @@ new StringBuilder()
     .toString();  // 每次循环 new StringBuilder + new String
 ```
 
-**循环 10 万次 = 10 万个 StringBuilder 对象 + 10 万个 String 对象**，频繁触发 GC，Eden 区被打满，CPU 飙高本质是 GC 压力。
+执行一次 `new StringBuilder().append("a").append(i).append("b").append(j).toString()`，堆上共 **4 次分配**：
+
+1. `StringBuilder` 对象本身
+2. 它内部的 `char[] buf`（默认容量 16，不够还会 `Arrays.copyOf` 再分配一次）
+3. `.toString()` 产生的 `String` 对象
+4. 该 `String` 内部的 `char[]`——**从 `buf` 复制一份**（不能共享：String 不可变，若共享 buf，之后 `append` 会改掉已生成的 String）
+
+**循环 10 万次 = 10 万次 × 4 次分配**，大量短命对象涌入 Eden 区，频繁触发 Minor GC，CPU 飙高本质是 GC 压力。
+（这 4 个分配逐一拆解见下文「[[#JDK 8：为什么是 4 次分配]]」）
 
 ---
 
-### JDK 17 的处理方式（invokedynamic + StringConcatFactory）
+### JDK 9+ / JDK 17 的处理方式（invokedynamic + StringConcatFactory）
 
-JDK 9+ 引入了 `invokedynamic` 指令配合 `StringConcatFactory`：
+> [!info] 版本分界点
+> **分界点是 JDK 9，不是 JDK 17。** JEP 280（`invokedynamic` + `StringConcatFactory`）在 **JDK 9** 就进了 `javac`，JDK 9/11/17 的拼接字节码**做法完全一样**。
+> 之所以题目问"JDK 17"，是因为 JDK 9 之后 `String` 底层换成 `byte[]`（Compact Strings，见 [[#Latin-1 优化（JDK 9+ Compact Strings）]]），单对象更小；但**这条拼接路径本身 JDK 9 就定型了**，17 并没有再改一次。
+
+自 JDK 9 起，`"a" + i + "b" + j` 的字节码不再是 `StringBuilder` 链，而是：
 
 ```
 // 字节码层面变为：
@@ -53,7 +65,7 @@ invokedynamic #7, 0  // BootstrapMethods: StringConcatFactory.makeConcatWithCons
 
 #### 相比 JDK 8 自动生成的 StringBuilder，三个优势
 
-1. **分配更少**：4 个 → 2 个（省掉 StringBuilder 对象本身 + 一次 char[] 复制）
+1. **分配更少**：**4 个 → 2 个**（省掉 StringBuilder 对象本身 + 一次 char[] 复制；4 个是什么见 [[#JDK 8：为什么是 4 次分配]]）
 2. **不扩容**：StringBuilder 默认容量 16、不够就 `Arrays.copyOf` 留下废弃数组；invokedynamic 先算精确长度、一次分配到位
 3. **解耦编译期**：「怎么拼最高效」交给运行时决定，以后优化不用改字节码、不用改语法
 
@@ -148,7 +160,7 @@ return new String(buf, LATIN1); // 共享这个 byte[]，不再复制
 
 关键差异对比：
 
-||JDK 8 `StringBuilder`|JDK 17 `StringConcatFactory`|
+||JDK 8 `StringBuilder`|JDK 9+ `StringConcatFactory`|
 |---|---|---|
 |对象分配|`new StringBuilder` + 内部 `char[]` + `new String` + 内部 `char[]`（复制一次）|直接 `new byte[]` + `new String`（共享，**不复制**）|
 |内存分配次数|**4次**|**2次**|
@@ -168,7 +180,7 @@ return new String(buf, LATIN1); // 共享这个 byte[]，不再复制
 
 
 
-# JDK 8：为什么是 4 次分配  JDK 17：为什么是 2 次分配
+# JDK 8：为什么是 4 次分配  JDK 9+：为什么是 2 次分配
 
 
 把两种方式的内存分配逐步拆开来讲。
@@ -207,7 +219,7 @@ String → char[]: [a][1][2][3][b]   ← 复制品，String 独占
 
 ---
 
-## JDK 17：为什么是 2 次分配
+## JDK 9+：为什么是 2 次分配
 
 `StringConcatFactory` 在 bootstrap 阶段已经知道模板是 `"a{}\b{}"` 以及每个参数的类型，所以它生成的方法可以：
 
@@ -235,13 +247,13 @@ JDK 8 堆里的样子：
 [String]        → [char[] copy: a5b3]   ← 从 buf 复制来的
 
 
-JDK 17 堆里的样子：
+JDK 9+ 堆里的样子：
 
 [byte[] buf: a5b3]
 [String]  ──────┘  直接引用，无复制
 ```
 
-所以 JDK 17 快在：**省掉了 StringBuilder + 一次数组复制**，但 `new byte[]` 和 `new String` 这两次分配在循环里每次照样发生，GC 压力的根本问题没有消失。
+所以 JDK 9+ 快在：**省掉了 StringBuilder + 一次数组复制**，但 `new byte[]` 和 `new String` 这两次分配在循环里每次照样发生，GC 压力的根本问题没有消失。
 
 
 
@@ -308,7 +320,7 @@ void ensureCapacityInternal(int minimumCapacity) {
 
 ---
 
-### 而 JDK 17 StringConcatFactory 为什么没有这个问题
+### 而 JDK 9+ StringConcatFactory 为什么没有这个问题
 
 它在拼接前**先算好精确长度**，一次性分配足够的 `byte[]`，不存在"分配少了再扩容"的情况，所以也不会产生那个废弃的中间数组。
 
@@ -370,7 +382,7 @@ private final byte coder;  // LATIN1 = 0, UTF16 = 1
   → coder = UTF16，退回每字符 2 bytes
 ```
 
-对于你们这个场景 `"a" + i + "b" + j`，全是 ASCII，JDK 17 下每个拼接结果的 `byte[]` 大小是 JDK 8 `char[]` 的一半，**单个对象更小，GC 压力也更小**，这是 JDK 17 在这个问题上又额外占便宜的地方。
+对于你们这个场景 `"a" + i + "b" + j`，全是 ASCII，JDK 9+ 下每个拼接结果的 `byte[]` 大小是 JDK 8 `char[]` 的一半，**单个对象更小，GC 压力也更小**，这是 JDK 9+ 在这个问题上又额外占便宜的地方。
 
 ---
 

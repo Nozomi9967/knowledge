@@ -210,5 +210,5 @@ public class SuperTest extends Date {
 - [[编译时类型和运行时类型可能不同]] —— `getClass()` 返回运行时类型、无法被重写
 - [[Java内部类]] —— 匿名/局部内部类里也会用到 `this` 与 effectively final
 - [[Java变量分类与默认值]] —— 构造方法、成员变量与默认值
-- [[Java基础热门面试题#16. Object 类有哪些常用方法？【中频】]] —— `getClass()` 与 `Object.class` 的区别
+- [[Java基础热门面试题-1#16. Object 类有哪些常用方法？【中频】]] —— `getClass()` 与 `Object.class` 的区别
 - [[DCL（Double-Checked Locking）单例完整展开]] —— 构造方法私有化与反射

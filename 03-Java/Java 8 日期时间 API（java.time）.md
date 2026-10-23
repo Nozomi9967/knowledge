@@ -138,7 +138,7 @@ Date back = Date.from(instant);
 
 ## 关联知识点
 
-- [[Java基础热门面试题#35. Java 8 有哪些新特性？【高频】]] —— 新日期时间 API 是其中一项
+- [[Java基础热门面试题-1#35. Java 8 有哪些新特性？【高频】]] —— 新日期时间 API 是其中一项
 - [[Java基础面试题#Java 新特性]] —— Java 8 新特性板块
 - [[StreamAPI]] —— 同属 Java 8 核心新特性
 - [[Function 和 Consumer（函数式接口）]] —— 同在 Java 8 语言特性

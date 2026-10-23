@@ -142,5 +142,5 @@ String msg = """
 
 - [[sealed class]] —— 同为 Java 17 新特性，密封类
 - [[循环内字符串拼接性能分析（JDK 8 vs JDK 17）]] —— 另一处 JDK 8 / 17 的字符串差异
-- [[Java基础热门面试题]] —— 第 35 题（Java 8 新特性）相关，可对照新特性章节
+- [[Java基础热门面试题-1]] —— 第 35 题（Java 8 新特性）相关，可对照新特性章节
 - [[Java基础面试题#String、StringBuffer、StringBuilder的区别和联系]] —— 字符串基础

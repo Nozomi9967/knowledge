@@ -1,49 +1,63 @@
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StreamTokenizer;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
 
 // 注意类名必须为 Main, 不要有任何 package xxx 信息
 public class Main {
-//    public static int[] cnt=new int[100001];
-
-    public static int compute(int x){
-        return x*(x-1)/2;
-    }
-
-    public static int bs(int x){
-        int l=2,r=Math.min(x/2,100000);
-        while(l<=r){
-            int mid=l+(r-l)/2;
-            if(compute(mid)>=x) r=mid-1;
-            else l=mid+1;
-        }
-        return l;
-    }
-
-    public static void main(String[] args) {
-        Scanner in = new Scanner(System.in);
-        int t=in.nextInt();
-//        for(int i=2;i<100001;i++){
-//            cnt[i]= i*(i-1)/2;
-//        }
+    public static void main(String[] args) throws IOException {
+        StreamTokenizer st = new StreamTokenizer(new BufferedReader(new InputStreamReader(System.in)));
+        st.nextToken();int t=(int)st.nval;
         while(t-->0){
-            int n=in.nextInt();
-            int y=0,c=0;
-            int nt= n/2;
-            int i=bs(nt);
-            for(;i>=2;i--){
-                int ci=compute(i);
-                if(n%ci==0){
-                    y=i;
-                    c=n/ci;
-                    break;
+            st.nextToken();int n=(int)st.nval;
+            int[] a=new int[n];
+            Map<Integer,Integer>[] cnt=new HashMap[n];
+            long[] b=new long[n];
+            int[] s=new int[n];
+            int count=0,index=0,tx=0;
+            for(int i=0;i<n;i++){
+                st.nextToken();a[i]=(int)st.nval;
+                cnt[i]=new HashMap<Integer,Integer>();
+                if(i>0) s[i]+=s[i-1]+a[i]-a[i-1];
+//                if(t==1&&i>0) System.out.println(i+" "+(a[i]-a[i-1]));
+                for(int j=i-1;j>=0;j--){
+                    int sub=s[i]-s[j];
+                    int num=i-j;
+                    if(sub%num==0){
+                        int x=sub/num;
+//                        if(t==1) System.out.println(sub+" "+num);
+                        int y=cnt[j].getOrDefault(x, 1)+1;
+                        int preY=cnt[i].getOrDefault(x, 1);
+//                        if(t==1){
+//                            System.out.println(i+" "+j);
+//                            System.out.println(sub+" "+num);
+//                        }
+                        if(y>preY) cnt[i].put(x,y);
+                        if(y>count){
+                            count=y;
+                            index=i;
+                            tx=x;
+                        }
+                    }
                 }
             }
-            if(y+c>100000) System.out.println(-1);
-            else{
-                System.out.println(y+c);
-                while(y-->0) System.out.print('y');
-                while(c-->0) System.out.print('c');
-                System.out.println();
+            for(int i=0;i<n;i++){
+                st.nextToken();b[i]=(long)st.nval;
             }
+            int tail=a[index]+tx*(n-index-1);
+//            if(t==1) System.out.println(tail);
+            long ans=0;
+            for(int i=n-1;i>=0;i--){
+                if(a[i]!=tail) ans+=b[i];
+                tail-=tx;
+            }
+            System.out.println(ans);
         }
+
+
     }
 }

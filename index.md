@@ -1,7 +1,11 @@
 # 八股 LLM Wiki — 内容索引
 
 > 本文件是 Wiki 的内容目录。每次 Ingest 后更新。查询时先读本文件定位相关页面。
-> 最后更新：2026-09-29（新建 [[Linux 网络模式详解]]：内核四件套 + 虚拟机三模式 + Docker 五模式；同日 [[机试]] 补 StringBuilder 速查）
+> 最后更新：2026-10-17（把此前未注册的 `10-面试/` 纳入索引，新增「面试专项」小节——[[针对实习的追问]]、[[tabbit_Java 接口响应时间异常排查思路]]、[[docker命令]]）
+> 2026-10-16（新建 [[数据结构热门面试题]]：数据结构全域 30 道热门面试题，自带口述化参考答案 + 追问参考答，与 [[树]]、[[图]]、[[排序算法笔试对照总表]]、[[HashMap Java 面试题完整详解（口述版）]]、[[跳表（Skip List）详解]] 相互跳转；同日新建 [[ClassCastException 详解]]：类型转换失败四大场景，补上「TreeMap/TreeSet 插入第一个元素抛 CCE」的 `compare(key, key)` 机制）
+> 2026-10-15（新建 [[知识盲点查漏补缺（豆包答疑）]]：豆包答疑 13 轮问答汇总，集中记录主动暴露的基础盲点）
+> 2026-10-14（第四批答疑落盘 10 处：[[计网热门面试题]] 新增 Q19 网络排障、[[char 与 UTF-16 编码]] 补三种编码全链路、[[Java反序列化gadget链详解]] 补 JEP 290 与 readResolve/transient 辨析等；同日第三批：[[OS八股]] 内核栈/参数校验、[[select 与 epoll 机制详解]] 队列归属、[[笔试]] #44 软链接深挖；新建 [[知识点整理提示词]]、[[OOM Killer 与容器内存详解]]）
+> 同日第五批（4 个知识点答疑）：新建 [[@Transactional 类上 vs 方法上]]、[[高峰期下单失败排查（场景题）]]、[[JOIN、LEFT JOIN、RIGHT JOIN 的区别]]；[[权限修饰符]] 补「属性/方法修饰符的书写次序」
 
 ---
 
@@ -12,6 +16,8 @@
 - [[整理准则]] — 知识整理规范（不动原文、不跳过图片、不精简）
 - [[出卷准则]] — 模拟面试卷出题规范
 - [[批卷准则]] — 批改面试卷的评分标准
+- [[知识点整理提示词]] — 一段原文 → 「知识点 / 知识点场景」两段式笔记的固定提示词（2026-10-14 定稿，含使用技巧）
+- [[知识盲点查漏补缺（豆包答疑）]] — 主动提问暴露的 13 个基础盲点集中记录（Spring 装配 / Class.forName 初始化 / 抽象类继承 / 代码块执行顺序 / AWT·Swing / JDBC DriverManager / Linux 权限 9 位 / 瀑布模型三阶段 / MySQL 增删改与主键·唯一索引对比），含自测清单
 
 ---
 
@@ -22,6 +28,9 @@
 ### 自我介绍
 - [[自我介绍（Java后端开发 · 面试版）]] — 90秒标准版 + 45秒精简版两版口述稿，加分细节展开表（秒杀/实习/AI开发）与注意事项
 
+### Nozomi House（个人项目）
+- [[项目里线程池用在哪（抢座调度池·定时任务池）]] — 场景题「讲一下你项目里用到线程池的场景」口述稿：抢座调度池 `ScheduledThreadPoolExecutor` 核心线程数按**同一瞬间并发任务数**（四账号八点同时抢座 → 4）而非核数、**DelayedWorkQueue 无界 → offer 永远成功 → max 与拒绝策略都是死配置**的机制推导、Spring `@Scheduled` 默认**单线程**（`spring.task.scheduling.pool.size=1`）导致邮件轮询堵住电费同步的真实故障 + 六个追问预案
+
 ### 云商城 nozomi-mall
 - [[云商城（nozomi-mall）一页纸]] — 背景/架构/难点/成果四段式一页纸：14 服务清单、技术栈版本表、4 个难点（热点发现链路 · Canal 双写一致 · Seata AT · 网关四层鉴权）、简历 bullet 模板
 - [[云商城已知硬伤与追问预案]] — 21 处代码级硬伤按 P0/P1/P2 分级 + 修复优先级 + 被追问时的话术（含 Seata 缺 undo_log、秒杀先查后扣非原子、幂等无唯一索引兜底等）
@@ -29,6 +38,16 @@
 - [[项目八股热门面试题]] — 项目全域热门面试题 **181 道**（**自带口述化参考答案 + 追问参考答**，每题答案按面试口述风格写）+ 23 个技术域速查表 + 硬伤速查表，覆盖项目总纲/Nacos/网关鉴权/Sentinel/Feign/Seata/Canal（含 **Q62 页面静态化：同步 vs 重建的辨析**）/ES/RocketMQ/Redis/Redisson/MySQL/MongoDB/MyBatis-Plus/Druid OLAP/ElasticJob/FastDFS/OpenResty/秒杀/安全/压测调优/部署运维/**硬伤追问预案 12 题**
 - [[项目面试考前速览卡（20题）]] — 考前 20 分钟扫读卡：从 180 题里挑最可能被追问的 **20 题**（项目总纲 3 · 秒杀链路 4 · 数据一致与核心组件 8 · 硬伤 5），每题只给「**开口第一句 + 必须说到 + 关键数字**」+ 硬伤 12 条速查 + 「只记住三句话」
 
+
+---
+
+## 面试专项（10-面试/）
+
+> 面试会话沉淀：实习追问、部署排查、接口排障等实战问答。
+
+- [[针对实习的追问]] — 两段实习（运维部署 + 后端告警模块）的面试追问预案：职责表述原则、Docker/Nginx 部署排查问答、后端 Bug 排查深挖案例，统一「现象—排查—定位—修复—验证」结构 + 风险提示（没做过的细节不要加）
+- [[tabbit_Java 接口响应时间异常排查思路]] — 「接口偶发突增 300ms，CPU 不高、GC 正常、慢查无报警」的 18 轮深度答疑：span 空洞含义、300ms 对号入座（重试/TCP 重传/Nagle）、Tomcat worker 排队 vs 连接池、安全点停顿/JIT 去优化/Metaspace、cgroup CPU 限流、wall-clock 采样 vs trace、工具清单，以及「给了 CPU 高/GC 异常/慢 SQL 特征」时各自的成因
+- [[docker命令]] — 部署实习常见 Docker / Docker Compose 命令速查（状态、日志、启动、排查四类）+ `docker run` vs `start`、`exec` vs `attach` 辨析 + 面试概括话术
 
 ---
 
@@ -119,6 +138,7 @@
 ### 查询优化
 - [[IN和EXISTS]] — IN 与 EXISTS 的执行差异与选择策略
 - [[最左前缀匹配范围查询不停止的原因]] — 为什么 >=、<=、BETWEEN、LIKE 前缀匹配不会让最左匹配停止
+- [[JOIN、LEFT JOIN、RIGHT JOIN 的区别]] — 内连接（交集）/ 左连接（保左表）/ 右连接（保右表）三类型对比 + 示例数据 + 两关键点（RIGHT 可改写为 LEFT、WHERE 过滤右表致退化）+ FULL OUTER JOIN 的 UNION 替代
 
 ### SQL 实战复盘
 - [[SQL学习复盘]] — 刷题会话沉淀：WHERE/聚合/GROUP BY·HAVING（含进阶：无 GROUP BY 时整表一个组、HAVING 不能裸列+聚合比较）/多表 JOIN/UNION/CASE/DISTINCT/次日留存率/字符串截取，窗口函数累计求和(SUM OVER)、ROW_NUMBER 排名、WITH(CTE)、条件聚合、GROUP BY 完整规则；牛客 1-40 题补：每组最值行(子查询+JOIN)、LEFT JOIN 聚合与 ON/WHERE 放置、COUNT(右表列) 陷阱、三表 JOIN 正确率、整体统计免 GROUP BY、REGEXP 校验，附考前易错清单
@@ -129,9 +149,11 @@
 
 ### Java 基础
 - [[Java基础面试题]] — Java 基础高频面试题集（已合并 [[Java基础面试题]] 的容器/IO/集合章节）
-- [[Java基础热门面试题]] — Java 基础全域热门面试题 44 道（自带口述化参考答案 + 追问参考答），覆盖基础概念/数据类型与包装类/String/面向对象/equals与hashCode/集合/异常/泛型/反射与注解/Java8新特性/IO-NIO/深拷贝序列化设计模式
+- [[Java基础热门面试题-1]] — Java 基础全域热门面试题（卷一）44 道（自带口述化参考答案 + 追问参考答），覆盖基础概念/数据类型与包装类/String/面向对象/equals与hashCode/集合/异常/泛型/反射与注解/Java8新特性/IO-NIO/深拷贝序列化设计模式
+- [[Java基础热门面试题-2]] — Java 基础全域热门面试题（卷二）33 道，与卷一互补不重复（自带口述化参考答案 + 追问参考答），覆盖变量分类/权限修饰符/super与this/对象创建/运算符/初始化顺序/内部类/枚举/设计原则/数组协变/字符编码/集合补充/异常与资源/IO流/零拷贝/动态代理/自定义注解/新版本特性/虚拟线程/不可变类/SPI/AtomicLong
 - [[Java内部类]] — Java 内部类四类辨析（成员 / 静态 / 局部 / 匿名）+ 内部类为何能访问外部类私有成员的编译期原理（`access$000`）+ 匿名内部类"只能使用一次"的精确表述（应为"只能在声明处实例化一次"）
 - [[Java变量分类与默认值]] — 实例变量 / 类变量 / 局部变量 / final 变量四类对照 + 默认值表（成员变量有默认值、**局部变量没有**）+ `final` 是修饰符不是"第四种变量"的澄清
+- [[权限修饰符]] — 四种访问权限修饰符可见性表（private/默认/protected/public）+ 使用场景 + `protected` 跨包细节 + **属性/方法修饰符的书写次序**（JLS 推荐顺序表、`private static final` 约定、访问修饰符只能一个且放最前）
 - [[设计模式（笔试面试常考）]] — 设计模式全景：GoF 23 种三分类总览表；创建型（单例五种写法+线程安全/全局状态隐式依赖、简单工厂 vs 工厂方法 vs 抽象工厂、建造者）、结构型（代理/装饰器/适配器辨析、装饰器为何+Java I/O 真实例子、AOP 与动态代理）、行为型（策略/状态/模板方法/责任链辨析、观察者 vs 发布订阅）；为何用/如何选型/「举一个你用的模式」回答模板 + 记忆口诀
 - [[Deque 方法速记（栈 vs 队列）]] — Deque 两组方法：栈风格 push/pop/peek（操作队头）vs 队列风格 offer/poll/peek（尾进头出），空时的异常/返回值区别，刷题速记
 - [[ConcurrentModificationException 详解（for-each remove 问题）]] — for-each 遍历 ArrayList 时 remove 抛 CME 的原因 + 三种修复方案取舍
@@ -144,14 +166,17 @@
 - [[泛型擦除]] — Java 泛型擦除机制：为什么要擦、擦成什么（无界 → Object、有界 → 上界）、四项限制（泛型数组 / 基本类型 / 运行时信息 / catch 泛型异常）、数组协变 vs 泛型不变
 - [[泛型通配符、泛型方法与桥方法]] — 泛型进阶：类型参数 `T` vs 通配符 `?`、PECS 原则（生产 / 消费是相对方法而言）、泛型方法（`<T>` 声明位置 / `Class<T>` 类型令牌）、类型变量 `T` 的三大运行时限制（`new T()` / `instanceof T` / `new T[]`）、**桥方法（bridge method）**、`.class` 常量池 vs 运行时常量池
 - [[Java 8 日期时间 API（java.time）]] — LocalDate/LocalTime/LocalDateTime、Instant、ZonedDateTime、Duration/Period、DateTimeFormatter；**不可变 + 线程安全**，取代 Date / SimpleDateFormat（后者内部 `Calendar` 可变、线程不安全）；LocalDateTime 无时区 vs Instant 才是"确定时刻" + 新旧互转
+- [[新旧时间 API 基本用法对照]] — 用法速查：老 API 三件套（`Date` 是毫秒容器 / `Calendar` 月份从 0 / `SimpleDateFormat` 线程不安全 + 三种将就修法）、新 API 四类型 + 加减比较 + `ZonedDateTime`、**`withZoneSameInstant` vs `withZoneSameLocal` 语义相反**、`Duration` vs `Period` vs `ChronoUnit`、新旧互转唯一桥梁 `Instant`、格式符陷阱表（`yyyy`/`MM`/`dd`/`HH`）、10 项对照表
 - [[super 与 this 详解]] — this 三种用法、super 三种用法；**super 不是父类实例**；构造方法第一行必须 `super()`/`this()`、缺省自动补 `super()`、构造器递归报错；`super.getClass()` 返回运行时类
 - [[char 与 UTF-16 编码]] — `char` = UTF-16、2 字节；一个 `char` 是"代码单元"不是"字符"；BMP 1 个 char、补充平面用代理对（`"😀".length()==2`，真正的计数用 `codePointCount`）
 - [[Java Socket 网络编程]] — Socket = "IP+端口"端点（= fd、四元组）；accept/read/write 各管什么；**BIO Echo 完整代码**；读写的端到端数据流；**非阻塞 read 返回 >0 / 0 / -1**；C10K 定义；**AIO 完成回调 vs Selector 可读通知**
+- [[ClassCastException 详解]] — 类型转换失败的非受检异常：四大触发场景（向下转型失败 / 泛型擦除后取元素的隐式强转 / **TreeMap-TreeSet 无 Comparator 且元素未实现 Comparable 时插入第一个元素就抛**——put 里 `compare(key, key)` 自比较强转 Comparable 失败 / 不同类加载器加载的同名类互转）+ 与 ArrayStoreException、NullPointerException（同条件下 null key 抛的是 NPE）、ClassNotFoundException、NoClassDefFoundError 的界限 + 避免手段与面试话术
 
 ### 并发
 - [[Java并发编程面试题]] — Java 并发编程八股总览（JMM、锁、AQS、线程池、ThreadLocal、CAS）
 - [[Java并发编程热门面试题]] — Java 并发全域热门面试题 27 道（无答案，自测后交批卷）+ 复习速查表，覆盖 JMM/synchronized/volatile/CAS/AQS/JUC 工具类/线程池/ThreadLocal/并发容器
 - [[ABA 问题详解]] — CAS 的 ABA 陷阱：无锁栈典型场景、AtomicStampedReference 版本号方案、AtomicMarkableReference 替代
+- [[AtomicLong 底层原理与高性能原因]] — **volatile 值 + CAS 自旋 + Unsafe/cmpxchg** 三层；为何比锁快（失败不阻塞、无内核态切换）；三大代价（自旋烧 CPU / 只能单变量 / ABA）；LongAdder 用 base+Cell[] 分散热点与两者选型
 - [[跨结构原子性与竞态窗口]] — 两个并发关键概念的刨析：跨结构原子性（空间跨度）与竞态窗口（时间空隙）
 - [[线程池]] — 线程池参数、拒绝策略、工作原理详解
 - [[ReentrantLock详解]] — ReentrantLock 四大特性、AQS 源码、Condition 多条件变量、面试话术
@@ -201,6 +226,8 @@
 ### 核心
 - [[Spring ioc]] — IoC 容器原理、依赖注入、Bean 生命周期
 - [[@SpringBootApplication解析]] — @SpringBootApplication 注解的三大核心注解解析
+- [[@Configuration 的 CGLIB 原地增强]] — 配置类为何被 CGLIB 增强（方法互调导致多个数据源）、增强体现在运行时字节码（换 BeanDefinition 的 beanClass、原方法改名藏进 CGLIB$ 前缀、内存 defineClass 不落盘）、wrap 包装代理 vs enhance 原地增强（解释与 @Transactional 自调用失效为何不冲突）、Full/Lite 模式与失效场景清单
+- [[@Transactional 类上 vs 方法上]] — 类上注解是默认配置、方法上注解覆盖它（覆盖非合并，未写属性回落默认值）；作用范围对比 + public/自调用/受检异常三要点
 - [[Spring-interview-guide]] — Spring 七大模块面试题口述版（IoC/Bean 生命周期/AOP/事务/MVC/Boot/Cloud）
 - [[自定义SpringBootStarter详解]] — 自定义 SpringBoot Starter 七步完整示例
 - [[SpringBoot 标准项目结构]] — Maven 管理的标准项目结构：启动类位置、包分层、resources 约定
@@ -217,6 +244,8 @@
 
 - [[计网八股]] — 计算机网络八股总览：TCP/IP、HTTP、HTTPS、OSI、**IP 地址分类与私有地址**（A/B/C/D/E 五类 + RFC1918 三块私有段 + 172.16~172.31 陷阱 + 特殊地址 127/169.254/0.0.0.0/组播）
 - [[TCP与UDP的区别]] — TCP/UDP 本质差异（可靠字节流 vs 尽力数据报）+ 六维度对比 + 选型四问 + 粘包拆包与消息边界、MTU/1472 由来
+- [[TIME_WAIT 与 FIN_WAIT_2 辨析]] — `tcp_fin_timeout` 真实语义（只管孤儿 FIN_WAIT_2，到期 RST 跳过 TIME_WAIT）+ FIN_WAIT_2 对 TIME_WAIT 数量的「筛选式」间接影响（N=λ×P×60s）+ 两种端口场景（监听端口 vs 临时端口 28232 上限）+ 缓解手段对比表 + 排查命令
+- [[时区与时间标准详解笔记]] — GMT 定义与 0 时区、GMT 被 UTC 取代的原因（原子钟 + 闰秒）、HTTP 为何强制 GMT（IMF-fixdate 格式）、三种历史日期格式、`CST` 六义性生产事故与 Java 正确写法、`Etc/GMT-8` 符号反转坑
 - [[计网热门面试题]] — 计算机网络高频简答卷 18 道（自带标准答案 + 追问），覆盖 TCP 三次/四次挥手与 SYN Flood、可靠性与拥塞控制、HTTP 状态码/缓存/幂等、HTTP/1.1 队头阻塞与 2.0/3.0 演进、HTTPS 三大风险与 RSA/ECDHE 前向安全
 - [[网络设备与安全概念（笔试速查）]] — 笔试零散网络概念速查：ACL、MPLS（标签/LSP/FEC）、IPsec（SA/SPI/ESP/AH，SA 单向 + SPI 定位）、IPSG（IP 源地址保护 + DHCP Snooping 配合）、私有地址对照
 
@@ -224,6 +253,7 @@
 
 ## 操作系统（08-操作系统/）
 
+- [[OS-IO篇]] — IO 端口（端口映射 IO vs MMIO、`in`/`out`、ioperm 例外）· 陷入内核三入口的同步/异步判据 · 时钟中断（tick 频率与抢占式调度基础）· vDSO（知识点/场景版）· 系统调用优化四招（writev/epoll/sendfile/vDSO）vs 异常缓解（mlock/大页/预读）vs 中断不可控
 - [[OS八股]] — 进程/线程/协程三层对比、用户态内核态与切换成本、虚拟内存与页面置换、死锁四条件与四种处理策略、IPC 六方式、五种 IO 模型与 epoll 三差异、零拷贝四种方案对比、Linux 排障命令、**文件权限与 chmod**（`ls -l` 十字符拆解、rwx=4/2/1 与三位八进制、文件 vs 目录权限差异、数字法/符号法、umask、SUID/SGID/Sticky）、**几个易混 Linux 概念**（SIGSEGV / `mv` 与 mtime / `ulimit -c` vs `-s` / `malloc` 与 brk、mmap）；每个概念都挂回 Java/中间件落点
 - [[OS热门面试题]] — 操作系统高频简答卷 23 道（自带标准答案 + 追问），覆盖进程线程协程/用户态内核态/调度与 Load/虚拟内存与页面置换/死锁/IPC/IO 模型与零拷贝/Linux 排障，全部口述化参考答案
 
@@ -233,6 +263,7 @@
 
 - [[树]] — **笔试常考树全谱**：二叉树核心性质（n0=n2+1 推导、层/深度公式、编号性质、二叉树≠度为 2 的有序树）+ 满/完全/严格(真)/斜二叉树辨析 + **四种遍历与"由遍历序列还原二叉树"**（先序+中序可定、先序+后序不可定）+ 线索二叉树（n+1 空指针域、tag 标志位）+ 树/森林↔二叉树转换（3 步互转 + 兄弟链判断与挂回 + **森林叶结点数 = 二叉树中左孩子指针为空的结点数**；先根↔先序、后根↔中序）+ BST（增删查/ASL/退化）+ AVL 四种旋转（LL/RR/LR/RL）+ 红黑树五性质与 AVL 对比 + B 树/B+ 树对比（为何 MySQL 用 B+）+ 哈夫曼树/WPL + **计算题速查公式表 + 易错点汇总**
 - [[图]] — 邻接矩阵存储（无向图→对称矩阵、$O(n^2)$ 空间）+ 邻接矩阵 vs 邻接表复杂度对比（空间/判相邻/遍历邻居/增删边/选型）+ 五种特殊矩阵定义速查（对称/上三角/下三角/对角/稀疏）+ 笔试易错点
+- [[数据结构热门面试题]] — 数据结构全域热门面试题 30 道（自带口述化参考答案 + 追问参考答），覆盖线性表（数组/链表/栈/队列/单调栈/循环队列/前缀和差分）/哈希表（结构/树化阈值/冲突解法/2 的幂容量）/树（二叉树性质与遍历/BST/AVL 与红黑树/B 树与 B+ 树/树森林转换/Trie）/堆与优先队列（数组存储/建堆 O(n)/TopK）/图（存储选型/BFS-DFS/Dijkstra/最小生成树）/工程结构（跳表/布隆过滤器/LRU/并查集）/复杂度与选型
 
 ---
 
@@ -259,6 +290,7 @@
 - [[Belady 异常与页面置换算法详解]] — FIFO 特有异常：Galvin 串逐帧演算（3 框 9 次 vs 4 框 10 次）、栈包含性质判据（LRU/OPT 为何免疫、FIFO 决策依据为何随框数抖动）、"工程为何宁用近似 LRU 不用 FIFO"、buffer pool/自写缓存扩容事故的现实出口
 - [[缺页异常详解]] — 软/硬缺页只以「要不要读盘」为界：mmap 共享建映射、fork 写时复制（权限型缺页转正）、匿名页首触（数量最大、malloc 便宜的原因与 AlwaysPreTouch）；三岔口入口（存在位/权限/非法）、minflt/majflt 观测、swap 换入必为硬缺页
 - [[进程内存指标与 glibc 分配详解]] — VIRT/RES/SHR 怎么读、top/ps/proc 四板命令（含 VmShr 大小写坑、VmHWM 峰值、smaps_rollup）；glibc 中间商与 free 不还内核的全流程；M_TRIM_THRESHOLD 自动收缩与 mmap 阈值动态上调两条"没那么绝对"；Java 侧 VIRT 巨大 ≠ 压力
+- [[OOM Killer 与容器内存详解]] — Q13 追问链深解：内存不够三步走的回收边界（页缓存 buff/cache 与容器计入、slab 的 slabtop/SUnreclaim）、swapoff 与 swap 区操作、oom_score 挑选与保护、cgroup v1/v2 限额文件与 cgroup OOM、dmesg 读法与输出逐行解读、退出码 137 全表、防 OOMKilled checklist + 11 条追问链速答表
 
 ### 操作系统 / Linux 排障
 
@@ -329,9 +361,12 @@
 ### 工程工具
 - [[Git 详解]] — Git 三大区域与工作流、常用命令速查（init/add/commit/diff/log/clone/pull/push + `--cached`/`-u`/origin）、diff 输出解读（`@@` 块与 `+`/`-`）、分支/合并冲突解决、撤销与恢复（restore vs revert vs reset 对比表）、stash/tag/checkout/.gitignore/.gitattributes/rebase/cherry-pick/reflog、LF-CRLF 行尾统一；含日常流程一句话 + 六个易错点
 - [[Maven 详解]] — POM/坐标（groupId:artifactId:version）/标准目录/仓库、生命周期（default 阶段链）+ 插件、依赖范围 scope 精确四维度表（compile/provided/runtime/test）、依赖传递与排除、多模块与 dependencyManagement、**SpringBoot 内嵌 Tomcat vs 外部 Tomcat 的 scope 对应**、Maven Wrapper、十个面试题参考答
+- [[命令行参数与Java系统属性区别]] — `--`（传给 Boot 应用、jar 后面、优先级最高）vs `-D`（传给 JVM、必须在 `-jar` 前面、JVM 全局可读）六维对比表、位置放错后果、环境变量第三易混项、完整优先级链与面试话术
+- [[SpringBoot静态资源处理详解]] — WebMvcAutoConfiguration 注册 ResourceHttpRequestHandler、先 Controller 后静态资源的 HandlerMapping 顺序、四个默认目录（META-INF/resources → resources → static → public，靠前优先）、static 前缀不出现在 URL、index.html 欢迎页、spring.web.resources 常用配置、与 DispatcherServletAutoConfiguration 分工、面试话术
 
 ### 面试综合
 - [[面试分析报告]] — 各公司面试高频考点分析报告
+- [[高峰期下单失败排查（场景题）]] — 高峰期下单失败七类原因（容器线程池打满 / 连接池耗尽 / 热点库存行锁 / 下游超时雪崩 / 事务过大 / 限流削峰缺失 / JVM 与基础设施）+ 异常类型对照表 + 排查与治理优先级 + 口述版答案
 - [[华为云校招-Redisson高频三题]] — 从 Redisson详解 筛出的华为云服务开发工程师校招最高频三题（锁原理+看门狗 → 锁过期事故链 → 锁粒度与全局单锁坦白话术），每题含口述参考答案、关键数字表、追问一句话答
 - [[华为云校招-Redis在项目里怎么用的]] — 追问链第一环：按请求链路讲 Redis 四类用法（网关布隆/RBAC → 读缓存 → 秒杀 Hash 扣减 → Redisson 客户端），场景总表全挂代码位置 + 钩子策略 + 三处笔记与代码矛盾标注
 - [[华为云校招-最容易考三题（计网·并发·索引）]] — 跨领域按出现概率出的三题（TCP 四次挥手与 TIME_WAIT → 线程池流程与参数 → InnoDB 索引），只出题不给答案；标注 T1 为全库缺口、OS 与手撕算法为待建区

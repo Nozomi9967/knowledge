@@ -5,7 +5,7 @@ tags:
 背诵开始: 2026-08-07 16:26
 背诵结束: 2026-08-10 14:46
 created: 2026-08-09
-updated: 2026-10-13
+updated: 2026-10-14
 ---
 # Spring 后端开发面试热门面试题（详细口述版）
 
@@ -97,6 +97,8 @@ Spring 生态也很丰富：Spring Boot 快速搭建项目、Spring MVC 处理 W
 -   **application**：ServletContext 范围内单例。
 -   **websocket**：WebSocket 会话内单例。
 **注意**：singleton Bean 注入 prototype Bean 时存在"只注入一次"的坑，详见 2.3 singleton 注入 prototype 的问题。
+
+**补充三个常被追问的点**：① 单例是"**每个容器、每个 Bean 定义**一个实例"，**不是 JVM 全局唯一**——同一个类定义多个 id 就会有多个实例；② 默认**容器启动时创建**（饥饿加载），加 `@Lazy` 才延迟到第一次使用；③ 单例被多线程共享，**有可变成员变量就要自己保证线程安全**，最佳实践是无状态设计。修改作用域用 `@Scope("prototype")`（等价 `ConfigurableBeanFactory.SCOPE_PROTOTYPE`），XML 写 `scope="prototype"`。
 
 ### 2.3 singleton Bean 注入 prototype Bean 会怎样？怎么解决？
 **口述回答**：

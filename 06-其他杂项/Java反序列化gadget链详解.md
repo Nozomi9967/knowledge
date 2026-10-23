@@ -5,7 +5,7 @@ tags:
   - 安全
   - 反序列化漏洞
 created: 2026-06-25
-updated: 2026-06-25
+updated: 2026-10-14
 source:
 ---
 
@@ -98,6 +98,18 @@ class WhitelistObjectInputStream extends ObjectInputStream {
 }
 ```
 
+**更推荐的做法：`ObjectInputFilter`（JEP 290）**。Java 9 起（并回移到 8u121）官方给出标准过滤器，不用自己继承 `ObjectInputStream`——直接在流上设置规则，能限制：可反序列化的类、数组最大长度、**对象图最大深度**、引用总数、流字节大小；除代码设置外，还可用 `-Djdk.serialFilter=...` 全局配置：
+
+```java
+ObjectInputFilter filter = ObjectInputFilter.Config.createFilter(
+    "com.example.dto.*;java.base/*;!*"   // 只允许指定包，其余全部拒绝
+);
+ois.setObjectInputFilter(filter);
+Object o = ois.readObject();
+```
+
+推荐用**白名单**：黑名单永远追不上新发现的 gadget。这也是「哪项做法最有效地防止反序列化攻击」类面试题的标准答案。
+
 ---
 
 ## 通俗理解
@@ -107,6 +119,18 @@ class WhitelistObjectInputStream extends ObjectInputStream {
 > - `readObject()` 是**按下开关**
 > - 导线一根连一根，最终引爆**炸弹**（`Runtime.exec()`）
 > - 你 classpath 上的三方 jar 就是这座"军火库"，你根本不知道里面哪根线能用
+
+---
+
+## 辨析：`readResolve` 与 `transient` 能防住反序列化攻击吗？
+
+**都不能——它们是序列化机制的功能钩子，不是安全防线。** 常见选择题的选项 A 和 D 就埋在这里：
+
+- **`readResolve()`**：在反序列化**已经创建出新对象之后**才被调用，用途是"用返回的对象替换刚还原的对象"——最典型是**保护单例**（不写它，反序列化会造出第二个实例）：`private Object readResolve() { return INSTANCE; }`。但它执行时，恶意类的 `readObject` 调用链**早就跑完了**，所以防不了攻击。
+  - 签名：`ANY-ACCESS-MODIFIER Object readResolve() throws ObjectStreamException`；`private` 时子类不继承，`protected` / `public` 时子类会继承（可能被替换成父类的单例，注意）。
+  - 与之对应的 `writeReplace()` 在**序列化前**替换要写出的对象；用 `enum` 写单例时 JVM 已保证反序列化唯一性，不需要手写 `readResolve`。
+- **`transient`**：只是让字段**不参与序列化**（常用于密码/密钥、可重算的缓存、线程/连接等进程相关资源）。它能防**敏感数据泄露**，但攻击利用的是类的方法调用链（gadget）、不依赖字段数据——把字段全设 `transient` 只能让序列化失去意义，防不了攻击。
+  - 注意：它只对 Java 原生序列化生效（JSON/Protobuf 有各自的注解，如 Jackson 的 `@JsonIgnore`）；反序列化后字段是默认值，需要恢复就实现 `readObject`、在 `defaultReadObject()` 之后补赋值。
 
 ---
 

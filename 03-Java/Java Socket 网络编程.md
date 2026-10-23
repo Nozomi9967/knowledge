@@ -14,7 +14,7 @@ source: 答疑会话（IO 流程 / accept-read-write / C10K / Socket 示例 / re
 
 > 补齐 Java 网络编程这一层：`Socket` 是什么、`accept/read/write` 各对应什么、**BIO 回显的完整代码**、一次读写的**端到端数据流**、以及两个高频细节——**非阻塞 `read()` 返回什么**、**AIO 回调 vs Selector 可读通知的区别**。
 >
-> 底层机制（多路复用、epoll、内核半连接队列）见 [[select 与 epoll 机制详解]]、[[OS八股]]；三种模型的整体对比见 [[Java基础热门面试题#39. BIO、NIO、AIO 的区别？【高频】]]。
+> 底层机制（多路复用、epoll、内核半连接队列）见 [[select 与 epoll 机制详解]]、[[OS八股]]；三种模型的整体对比见 [[Java基础热门面试题-1#39. BIO、NIO、AIO 的区别？【高频】]]。
 
 ---
 
@@ -222,8 +222,8 @@ channel.read(buffer, attachment, new CompletionHandler<Integer, Object>() {
 ## 关联知识点
 
 - [[select 与 epoll 机制详解]] —— 多路复用、socket = fd、四元组、半连接队列、C10K 的底层账
-- [[Java基础热门面试题#39. BIO、NIO、AIO 的区别？【高频】]] —— 三种模型整体对比 + 同步/异步、阻塞/非阻塞
-- [[Java基础热门面试题#40. NIO 的核心组件和原理？【中频】]] —— Channel / Buffer / Selector
+- [[Java基础热门面试题-1#39. BIO、NIO、AIO 的区别？【高频】]] —— 三种模型整体对比 + 同步/异步、阻塞/非阻塞
+- [[Java基础热门面试题-1#40. NIO 的核心组件和原理？【中频】]] —— Channel / Buffer / Selector
 - [[Java基础面试题#BIO、NIO、AIO区别是什么？]] —— 长版对比 + 餐厅类比
 - [[网卡收包流程详解]] —— 收包侧内核链路（DMA → 软中断 → 协议栈 → socket 队列 → read）
 - [[OS八股]] —— POSIX 五种 IO 模型（§7.1–7.2）

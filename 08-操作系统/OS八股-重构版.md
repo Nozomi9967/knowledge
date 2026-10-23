@@ -391,6 +391,8 @@ updated: 2026-10-12
 | 元凶 | **可能在堆外**：DirectByteBuffer、线程栈、别的进程 | 就在堆内：泄漏或配置不合理 |
 | 加 -Xmx | **死得更快** | 机器有余量时可能真管用 |
 
+> 追问链深解（cgroup 限额与 OOMKilled 排查命令、dmesg 读法、退出码 137 全表、swapoff / swap 区操作）见 [[OOM Killer 与容器内存详解]]。
+
 ### 页面置换算法
 
 | 算法 | 思路 | 现实 |
@@ -611,6 +613,8 @@ IO 多路复用  ：①一个线程等多个 fd，就绪后 ②拷
 ## 9.3 面试
 
 > Q5（程序崩溃原因）的容器分支在这里。
+>
+> 容器内存追问链深解（cgroup v1/v2 限额文件、为什么容器 Java 容易 OOMKilled、docker/kubectl 排查命令组）→ [[OOM Killer 与容器内存详解#五、容器与 cgroup：Java 进程为什么要特别小心]]
 
 ---
 

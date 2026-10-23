@@ -88,4 +88,4 @@ public void method() {
 - [[Java内部类]] —— 同一批笔试考点：内部类四类辨析 + effectively final 局部变量
 - [[Java基础面试题#解释Java中的静态变量和静态方法]] —— 类变量（静态变量）与静态方法详解
 - [[jvm八股]] —— 栈帧、方法区、对象分配：变量在运行期分别住在哪
-- [[Java基础热门面试题]] —— 第 14 题（final / static 的作用）出处
+- [[Java基础热门面试题-1]] —— 第 14 题（final / static 的作用）出处

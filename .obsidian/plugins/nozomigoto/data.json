@@ -4,7 +4,7 @@
   "baseUrl": "http://127.0.0.1:8787/v1",
   "model": "deepseek-v4-flash-stable",
   "numQuestions": 5,
-  "logNotePath": "学习记录.md",
+  "logNotePath": "00-元数据/总学习记录.md",
   "nozomiBaseUrl": "https://47.97.173.20",
   "nozomiUser": "Nozomi",
   "nozomiToken": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJOb3pvbWkiLCJyb2xlIjoidXNlciIsImlhdCI6MTc5MTEyNjU2OCwiZXhwIjoyMTA2NDg2NTY4fQ.A81m0Jo5B9tsNzxdIcbB8W0u2_ZPCfNcvVBr-C50WOA",

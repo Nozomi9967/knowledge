@@ -151,6 +151,45 @@ public @interface EnableAutoConfiguration { ... }
 - 扫描 `@Component`、`@Service`、`@Repository`、`@Controller` 等注解的类
 - 由 `ClassPathBeanDefinitionScanner` 完成实际扫描工作
 
+#### `AutoConfigurationExcludeFilter` 到底在防什么
+
+`@SpringBootApplication` 上的 `@ComponentScan` 默认会扫启动类所在包及其子包。如果自动配置类（`DataSourceAutoConfiguration`、`WebMvcAutoConfiguration` 这类）落在扫描范围内，它们就会被**当成普通配置类直接注册**，绕过自动配置的正常机制。这个过滤器（`TypeFilter` 接口的实现）就是用来把它们排除在扫描结果之外的。
+
+**判断逻辑只有两个条件，同时满足才排除**：
+
+1. 类上有 `@Configuration`
+2. 类名出现在"自动配置候选列表"里
+
+这个候选列表来自 Spring Boot 的元数据：**2.7 之前**在 `META-INF/spring.factories` 的 `EnableAutoConfiguration` 键下，**2.7 之后**改为 `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`。
+
+**关键点：它不会排除你自己写的 `@Configuration` 类**——那些类不在候选列表里，照常扫描。
+
+**为什么必须有它**，两个原因：
+
+第一，自动配置类上挂满了 `@ConditionalOnMissingBean`、`@ConditionalOnClass` 这类条件注解，它们依赖 `AutoConfigurationImportSelector` 按固定顺序统一加载。如果被组件扫描提前注册，**条件判断的时机和顺序就乱了**——可能出现用户定义的 Bean 被覆盖，或者容器里出现重复 Bean。
+
+第二，自动配置类应该由框架"按需导入"，而不是因为恰好位于某个扫描路径下就被强行生效。
+
+**什么时候会失效**：只有当你手动写了 `@ComponentScan` 且扫描范围覆盖 `org.springframework.boot.autoconfigure` 包时，这层保护才失效：
+
+```java
+// ❌ 错误示范：把自动配置包也扫进来了
+@SpringBootApplication
+@ComponentScan(basePackages = {"com.example", "org.springframework.boot.autoconfigure"})
+public class App { }
+```
+
+**失效后的两种典型报错**：
+
+| 情况 | 异常 |
+|---|---|
+| 两个 Bean 同名（都叫 `dataSource`） | `BeanDefinitionOverrideException`（Spring Boot 2.1+ 默认禁止 Bean 覆盖） |
+| 名字不同，但类型相同 | `NoUniqueBeanDefinitionException`（按类型注入时无法确定选哪个） |
+
+**排查与解决**：把扫描范围缩回自己的业务包，让自动配置类只通过 `AutoConfigurationImportSelector` 按条件导入；或者开启 debug 看 `ConditionEvaluationReport`，确认自动配置类是被"扫描"进来的还是被"导入"进来的。
+
+> 顺带区分：`@SpringBootApplication` 里还有另一个 `TypeExcludeFilter`，它允许测试场景（`TestTypeExcludeFilter`）排除部分组件，两个过滤器配合控制最终扫描结果。
+
 ------
 
 ## 完整启动流程

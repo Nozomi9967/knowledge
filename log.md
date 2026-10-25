@@ -1,3 +1,39 @@
+## [2026-10-25] ingest | 补入 @Async 专题 + 循环依赖代理收尾 + AutoConfigurationExcludeFilter
+
+**来源：** 用户提供的 tabbit 剪藏（264 行，含 @Async 三问答、Spring 循环依赖三级缓存的连续追问、AutoConfigurationExcludeFilter 答疑）。
+
+**先做覆盖比对**，避免重复写：
+
+| 主题 | 知识库现状 | 处理 |
+|---|---|---|
+| @Async | 只在题21 和几篇项目笔记里零散提及，**无专题页** | **新建** |
+| 循环依赖三级缓存 | `Spring ioc` 已有 8-16 题（含构造器注入、prototype、AOP 时机） | **补充** 16.1 |
+| `earlyProxyReferences` | **全库零命中**，且原 16 题说"靠 advisedBeans 去重"不精确 | 补充并纠正 |
+| AutoConfigurationExcludeFilter | `@SpringBootApplication解析` 只在注解参数里出现名字 | **补充**详解 |
+| TaskExecutionAutoConfiguration | 有零散提及 | 并入 @Async 专题 |
+
+**新建：** `04-Spring/4-AOP与事务/@Async 异步执行详解.md`
+
+六节：本质（AOP + 线程池三层机制）/ 返回值与异常（void 靠 AsyncUncaughtExceptionHandler，Future 包装）/ 线程池三层退让（唯一 TaskExecutor → taskExecutor → 退化 SimpleAsyncTaskExecutor）+ TaskExecutionAutoConfiguration 与自定义示例 / 五个必踩的坑（自调用、final-private、上下文不传递、事务独立、双注解顺序）/ 与 @Transactional 对比表 / 面试话术。
+
+**补充一：** `Spring ioc` 新增 16.1 节「循环依赖下的代理与初始化」
+
+- 纠正原文：防重复代理靠 `earlyProxyReferences`，`advisedBeans` 是"切面是否已解析"的标记，两者别混
+- 三条时间线：B 拿早期代理 / A 初始化作用在原始对象上 / doCreateBean 收尾替换
+- 贴出 `postProcessAfterInitialization` 与 `doCreateBean` 收尾的关键伪代码
+- 三种情况对照表（无代理 / 提前代理过 / 后置处理器换成新对象）
+- 讲清"为什么要替换"：不替换会出现容器里是原始对象、B 手里是代理，@Transactional 和 @Async 对 B 全部失效
+
+**补充二：** `@SpringBootApplication解析` 的 @ComponentScan 小节加「AutoConfigurationExcludeFilter 到底在防什么」
+
+判断逻辑（两个条件）、元数据来源（spring.factories → 2.7 后改 AutoConfiguration.imports）、为什么必须有（条件注解时机与顺序）、何时失效（手动 @ComponentScan 覆盖 autoconfigure 包）、失效后两种报错（BeanDefinitionOverrideException / NoUniqueBeanDefinitionException）、排查解决。
+
+**index：** 04-Spring 的 4-AOP与事务 由 2 篇改 3 篇；Spring ioc 与 @SpringBootApplication解析 的描述补上新增章节。
+
+**验证：** 三处新增内容断链 0；Spring 区块 23 条 = 主目录 23 篇。
+
+---
+
 ## [2026-10-25] ingest | 算法题 20 道待补题解全部写完
 
 **触发：** 用户要求补算法题的 20 道待补题解（清单在 `算法题/00-总览/待补题解清单.md`）。

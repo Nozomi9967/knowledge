@@ -364,6 +364,96 @@ Spring Boot 2.x 起 `spring.aop.proxy-target-class` 默认 true，即默认 CGLI
 
 ---
 
+### 16.1 循环依赖下的代理与初始化：`earlyProxyReferences` 到底在干什么
+
+> 这一节是 16 题的深挖。**先纠正上面口述版里一处不精确**：防重复代理靠的是 `earlyProxyReferences`，`advisedBeans` 是另一个用途（标记"这个 Bean 的切面已经解析过、不需要代理"），两者别混。
+
+#### 一、三条时间线要分开看
+
+循环依赖场景里，A 有两条"线"在同时走：
+
+```
+线 1（B 的视角）：
+  B 填充属性需要 A → 调三级缓存的 ObjectFactory → getEarlyBeanReference
+  → 如果 A 需要 AOP，这里生成代理 A′ → 放进二级缓存 → B 拿到 A′
+
+线 2（A 自己的视角）：
+  A 实例化出原始对象 → populateBean → initializeBean
+  → Aware 回调 / 前置处理 / init 方法 / 后置处理
+  → 全部作用在【原始对象】上，不是 A′
+```
+
+**关键结论：A 的初始化是在原始对象上做的，二级缓存里的代理不会被再初始化一次。**
+
+#### 二、`earlyProxyReferences` 解决什么
+
+如果 A 的代理在 `getEarlyBeanReference` 阶段已经生成了，那么 A 走到 `postProcessAfterInitialization` 时，`AbstractAutoProxyCreator` 会**先查 `earlyProxyReferences`**：
+
+```java
+// AbstractAutoProxyCreator.postProcessAfterInitialization 的简化逻辑
+public Object postProcessAfterInitialization(Object bean, String beanName) {
+    if (bean != null) {
+        Object key = (beanName != null ? beanName : bean);
+        // 如果这个 Bean 的代理已经在循环依赖时提前生成过，就不再包一层
+        if (!this.earlyProxyReferences.remove(key).equals(bean)) {
+            return wrapIfNecessary(bean, beanName, cacheKey);
+        }
+    }
+    return bean;
+}
+```
+
+- **登记时机**：`getEarlyBeanReference` 里生成代理后，把 beanName 放进 `earlyProxyReferences`
+- **检查时机**：`postProcessAfterInitialization` 里查一下，登记过就**直接返回原始 bean**（不再 `wrapIfNecessary`）
+- **作用**：保证同一个 Bean 只被代理一次，不会出现"B 手里是一个代理、容器里是另一个代理"
+
+**注意"返回原始对象"的含义**：这一步只是"不再包第二层代理"，不代表最终容器里放的是原始对象——最终会由下面的收尾逻辑替换掉。
+
+#### 三、`doCreateBean` 的收尾替换（最容易被问住的一步）
+
+初始化结束后，`doCreateBean` 还有一段收尾：
+
+```java
+// doCreateBean 尾部（简化）
+Object exposedObject = bean;                    // 初始化后的对象
+try {
+    populateBean(beanName, mbd, instanceWrapper);
+    exposedObject = initializeBean(beanName, exposedObject, mbd);
+} catch (Throwable ex) { ... }
+
+// 如果这个 Bean 曾经提前暴露过，检查缓存里的早期引用
+if (earlySingletonExposure) {
+    Object earlySingletonReference = getSingleton(beanName, false);   // 只查一二级
+    if (earlySingletonReference != null) {
+        if (exposedObject == bean) {
+            // 初始化没有产生新对象，用二级缓存里的代理替换
+            exposedObject = earlySingletonReference;
+        } else if (!this.allowRawInjectionDespiteWrapping && hasDependentBean(beanName)) {
+            // 后置处理器生成了新对象，但 B 已经拿到了早期代理 → 冲突
+            throw new BeanCurrentlyInCreationException(beanName);
+        }
+    }
+}
+```
+
+三种情况：
+
+| 情况 | `exposedObject` | 结果 |
+|---|---|---|
+| 无代理、无后置替换 | `== bean` | 正常，放原始对象 |
+| 循环依赖时提前生成过代理 | `== bean`（后置处理没再包） | **替换成二级缓存里的 A′**，放代理 |
+| 后置处理器换成了别的实例（如另一个代理） | `!= bean` | 若存在依赖方 → 抛 `BeanCurrentlyInCreationException` |
+
+**为什么必须替换**：不替换的话，容器一级缓存里是原始对象 A，而 B 内部持有的是代理 A′——同一个 Bean 在系统里出现两个不同实例，`@Transactional`、`@Async` 这些依赖代理的增强对 B 完全失效。这一步就是为了保证"对外只有一个 A"。
+
+#### 四、一句话收口（面试可直接用）
+
+循环依赖时，代理在 `getEarlyBeanReference` 提前生成并放进二级缓存，同时把 Bean 名登记进 `earlyProxyReferences`；A 后续的初始化始终作用在原始对象上，`postProcessAfterInitialization` 查到登记记录就直接返回原始对象、不再包第二层；最后 `doCreateBean` 收尾时，如果 `exposedObject` 还是原始对象，就用二级缓存里的代理替换它再放进一级缓存，保证 B 手里的引用和容器里的成品是同一个。
+
+**三个东西的分工**：`earlyProxyReferences` 防重复代理，二级缓存存早期引用，`singletonCurrentlyInCreation` 标记"正在创建"并作为提前引用的准入条件。
+
+---
+
 ### 17. AOP 相关核心组件
 
 | 组件 | 作用 |

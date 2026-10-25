@@ -1,6 +1,7 @@
 # 八股 LLM Wiki — 内容索引
 
 > 本文件是 Wiki 的内容目录。每次 Ingest 后更新。查询时先读本文件定位相关页面。
+> 最后更新：2026-10-25（补入 @Async 专题（新建）+ 循环依赖下 earlyProxyReferences 与代理收尾（补进 Spring ioc 16.1）+ AutoConfigurationExcludeFilter 详解（补进 @SpringBootApplication解析）；04-Spring 4-AOP与事务 2→3 篇）
 > 最后更新：2026-10-25（`算法题/` 清掉 49 个空壳：29 个分类索引 + 20 个待补题解归档到 `算法题/归档/`，后者合并为 [[待补题解清单]]；根目录 4 篇与 `其他/` 6 篇归位到 `00-总览/` 与对应题型目录）
 > 最后更新：2026-10-25（`10-面试/` 分 5 组 45 篇：0-题库 30（含 Java 后端 50 题与 27 篇题解）/ 1-场景与排查 4 / 2-面试实战 3 / 3-公司专项 6 / 4-专项笔记 2）
 > 最后更新：2026-10-25（`07-简历项目/` 分 5 组 19 篇：0-题库 2 / 1-云商城 10（含 7 章课程笔记）/ 2-Nozomi House 3 / 3-面试素材 2 / 4-开发记录 2）
@@ -426,8 +427,8 @@
 
 ### 2-IoC与Bean（2 篇）
 
-- [[Spring ioc]] — IoC 容器原理、依赖注入、Bean 生命周期与作用域（504 行深度版）
-- [[@SpringBootApplication解析]] — 三大核心注解拆解：@SpringBootConfiguration / @EnableAutoConfiguration / @ComponentScan
+- [[Spring ioc]] — IoC 容器原理、依赖注入、Bean 生命周期与作用域、三级缓存与循环依赖（含 16.1 节：earlyProxyReferences 与循环依赖下的代理收尾）
+- [[@SpringBootApplication解析]] — 三大核心注解拆解 + AutoConfigurationExcludeFilter 在防什么（判断逻辑、元数据来源、失效后的两种报错）
 
 ### 3-SpringBoot核心（11 篇）
 
@@ -444,10 +445,11 @@
 - [[SpringBoot静态资源处理详解]] — 静态资源映射与拦截器顺序（先 Controller 后静态资源）
 - [[命令行参数与Java系统属性区别]] — --key=value 与 -Dkey=value 的解析链路与优先级
 
-### 4-AOP与事务（2 篇）
+### 4-AOP与事务（3 篇）
 
 - [[@Configuration 的 CGLIB 原地增强]] — Full/Lite 模式、wrap 包装 vs enhance 原地增强、增强失效场景
 - [[@Transactional 类上 vs 方法上]] — 类上作默认、方法上覆盖，public / 自调用 / 受检异常三要点
+- [[@Async 异步执行详解]] — AOP + 线程池的本质、返回值与异常处理、线程池三层退让、五个必踩的坑（自调用 / final / 上下文丢失 / 事务独立 / 双注解顺序）
 
 ### 5-微服务组件（4 篇）
 
